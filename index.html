@@ -262,6 +262,50 @@ html, body {
   background: var(--text-m);
 }
 
+/* Spec Table */
+.spec-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 28px;
+  font-size: 13px;
+}
+.spec-table th,
+.spec-table td {
+  text-align: left;
+  padding: 8px 10px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  line-height: 18px;
+}
+.spec-table th {
+  color: var(--text-m);
+  font-weight: 500;
+  font-size: 12px;
+  white-space: nowrap;
+  vertical-align: top;
+  width: 120px;
+}
+.spec-table td {
+  color: var(--text-s);
+}
+.spec-table td code {
+  font-family: 'SF Mono', 'Menlo', monospace;
+  font-size: 12px;
+  background: rgba(238,238,238,0.08);
+  padding: 2px 6px;
+  border-radius: 4px;
+  color: var(--text-p);
+}
+.spec-table .sub-label {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--blue);
+  padding: 12px 10px 4px;
+  border-bottom: none;
+}
+
 /* Best for */
 .best-for {
   margin-top: 20px;
@@ -339,6 +383,25 @@ html, body {
           </li>
         </ol>
 
+        <div class="section-label">Value Input Rules</div>
+        <table class="spec-table">
+          <tr><td class="sub-label" colspan="2">Percent 모드 (%)</td></tr>
+          <tr><th>기본값</th><td><code>0.02%</code> (프리셋 선택)</td></tr>
+          <tr><th>범위</th><td><code>0.01%</code> – <code>10%</code></td></tr>
+          <tr><th>프리셋</th><td>0.01 · 0.02 · 0.05 · 0.1 · 0.5 + Customize</td></tr>
+          <tr><th>힌트</th><td><code>Range: 0.01% – 10%</code></td></tr>
+          <tr><td class="sub-label" colspan="2">Price 모드 (USDT)</td></tr>
+          <tr><th>기본값</th><td>없음 (프리셋 미선택 상태)</td></tr>
+          <tr><th>범위</th><td><code>0.1</code> – <code>1,000</code> USDT</td></tr>
+          <tr><th>프리셋</th><td>5 · 10 · 20 · 50 · 100 + Customize</td></tr>
+          <tr><th>힌트</th><td><code>Auto-capped at max</code> (실시간 시세로 범위 변동)</td></tr>
+          <tr><td class="sub-label" colspan="2">공통 (Customize 입력)</td></tr>
+          <tr><th>허용 문자</th><td>숫자 + <code>.</code> 만 허용, 소수점 1개 제한</td></tr>
+          <tr><th>Max 초과</th><td>타이핑 시점에서 즉시 max 값으로 자동 치환</td></tr>
+          <tr><th>Min 미만</th><td>Confirm 시점에서 min으로 클램핑</td></tr>
+          <tr><th>빈 값</th><td>Percent → 마지막 유효값 복원 / Price → empty 유지</td></tr>
+        </table>
+
         <div class="pros-cons">
           <div class="pc-block">
             <div class="pc-title pros"><span class="pc-dot"></span>장점</div>
@@ -397,6 +460,25 @@ html, body {
             <span class="flow-text"><strong>Buy/Sell 탭</strong> → 오더 프리뷰 바텀시트. 슬리피지 ON 시 Max slippage (% + USDT) · Max exec. price 표시</span>
           </li>
         </ol>
+
+        <div class="section-label">Value Input Rules</div>
+        <table class="spec-table">
+          <tr><td class="sub-label" colspan="2">Percent 모드 (%)</td></tr>
+          <tr><th>기본값</th><td><code>0.02%</code></td></tr>
+          <tr><th>범위</th><td><code>0.01%</code> – <code>10%</code></td></tr>
+          <tr><th>힌트</th><td><code>Range: 0.01% – 10%</code></td></tr>
+          <tr><th>입력 방식</th><td>인라인 텍스트 필드 직접 입력</td></tr>
+          <tr><td class="sub-label" colspan="2">Price 모드 (USDT)</td></tr>
+          <tr><th>기본값</th><td>없음 (empty — 유저 직접 입력 필수)</td></tr>
+          <tr><th>범위</th><td><code>0.1</code> – <code>1,000</code> USDT</td></tr>
+          <tr><th>힌트</th><td><code>Auto-capped at max</code> (실시간 시세로 범위 변동)</td></tr>
+          <tr><th>입력 방식</th><td>인라인 텍스트 필드 직접 입력, placeholder 없음</td></tr>
+          <tr><td class="sub-label" colspan="2">공통</td></tr>
+          <tr><th>허용 문자</th><td>숫자 + <code>.</code> 만 허용, 소수점 1개 제한</td></tr>
+          <tr><th>Max 초과</th><td>타이핑 시점에서 즉시 max 값으로 자동 치환</td></tr>
+          <tr><th>Min 미만</th><td>blur 시점에서 min으로 클램핑 + 에러 플래시 (1.2s)</td></tr>
+          <tr><th>빈 값 blur</th><td>Percent → 마지막 유효값 복원 / Price → empty 유지</td></tr>
+        </table>
 
         <div class="pros-cons">
           <div class="pc-block">
