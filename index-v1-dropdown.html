@@ -1678,6 +1678,15 @@ custInput.addEventListener('input', function() {
   this.value = this.value.replace(/[^0-9.]/g, '');
   const parts = this.value.split('.');
   if (parts.length > 2) this.value = parts[0] + '.' + parts.slice(1).join('');
+
+  // Auto-clamp to max on typing
+  const val = parseFloat(this.value);
+  if (!isNaN(val)) {
+    const max = custMode === 'percent' ? 10 : 1000;
+    if (val > max) {
+      this.value = String(max);
+    }
+  }
 });
 
 document.getElementById('custConfirm').addEventListener('click', function() {
