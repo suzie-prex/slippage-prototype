@@ -1556,7 +1556,7 @@ function syncInputDisplay() {
   } else {
     slipUnitText.textContent = 'USDT';
     slipField.value = selectedPrice !== null ? formatNum(selectedPrice) : '';
-    slipField.placeholder = '10';
+    slipField.placeholder = '';
     slipRangeHint.textContent = 'Range: 0.1 – 1,000.0 USDT';
   }
   slipInputGroup.classList.remove('error');
