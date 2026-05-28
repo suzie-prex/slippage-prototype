@@ -1553,11 +1553,13 @@ function syncInputDisplay() {
     slipField.value = formatNum(selectedPercent);
     slipField.placeholder = '0.02';
     slipRangeHint.textContent = 'Range: 0.01% – 10%';
+    slipRangeHint.style.display = '';
   } else {
     slipUnitText.textContent = 'USDT';
     slipField.value = selectedPrice !== null ? formatNum(selectedPrice) : '';
     slipField.placeholder = '';
-    slipRangeHint.textContent = 'Range: 0.1 – 1,000.0 USDT';
+    slipRangeHint.textContent = '';
+    slipRangeHint.style.display = 'none';
   }
   slipInputGroup.classList.remove('error');
   slipRangeHint.classList.remove('error');

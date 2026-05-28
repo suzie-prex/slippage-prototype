@@ -1654,10 +1654,12 @@ function openCustomize(mode) {
     custUnit.textContent = '%';
     custHint.textContent = '0.01% – 10%';
     custRange.textContent = 'Range: 0.01% – 10%';
+    custRange.style.display = '';
   } else {
     custUnit.textContent = 'USDT';
-    custHint.textContent = '0.1 – 1,000.0';
-    custRange.textContent = 'Range: 0.1 – 1,000.0 USDT';
+    custHint.textContent = '';
+    custRange.textContent = '';
+    custRange.style.display = 'none';
   }
   setTimeout(() => custInput.focus(), 150);
 }
