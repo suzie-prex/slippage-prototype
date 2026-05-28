@@ -1514,7 +1514,6 @@ document.getElementById('slippageRow').addEventListener('click', function(e) {
   if (slippageEnabled) {
     slipInputRow.classList.add('visible');
     syncInputDisplay();
-    setTimeout(() => slipField.focus(), 80);
   } else {
     slipInputRow.classList.remove('visible');
     closeUnitDd();
