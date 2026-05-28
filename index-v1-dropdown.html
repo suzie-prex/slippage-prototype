@@ -1658,8 +1658,8 @@ function openCustomize(mode) {
   } else {
     custUnit.textContent = 'USDT';
     custHint.textContent = '';
-    custRange.textContent = '';
-    custRange.style.display = 'none';
+    custRange.textContent = 'Auto-adjusted to max if exceeded';
+    custRange.style.display = '';
   }
   setTimeout(() => custInput.focus(), 150);
 }

@@ -1567,8 +1567,8 @@ function syncInputDisplay() {
     slipUnitText.textContent = 'USDT';
     slipField.value = selectedPrice !== null ? formatNum(selectedPrice) : '';
     slipField.placeholder = '';
-    slipRangeHint.textContent = '';
-    slipRangeHint.style.display = 'none';
+    slipRangeHint.textContent = 'Auto-adjusted to max if exceeded';
+    slipRangeHint.style.display = '';
   }
   slipInputGroup.classList.remove('error');
   slipRangeHint.classList.remove('error');
