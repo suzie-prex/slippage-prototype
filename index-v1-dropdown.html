@@ -1753,14 +1753,15 @@ function openPreview(side) {
     pvExecRow.classList.add('visible');
     pvSlipDivider.classList.add('visible');
 
-    // Max slippage display
+    // Max slippage display — show both % and USDT
     if (currentMode === 'percent') {
-      pvSlipVal.textContent = selectedPercent + '%';
-      const offset = BASE_PRICE * (selectedPercent / 100);
-      const maxPrice = side === 'buy' ? BASE_PRICE + offset : BASE_PRICE - offset;
+      const usdtAmt = BASE_PRICE * (selectedPercent / 100);
+      pvSlipVal.textContent = selectedPercent + '% (' + usdtAmt.toFixed(2) + ' USDT)';
+      const maxPrice = side === 'buy' ? BASE_PRICE + usdtAmt : BASE_PRICE - usdtAmt;
       pvExecVal.textContent = maxPrice.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' USDT';
     } else {
-      pvSlipVal.textContent = selectedPrice + ' USDT';
+      const pctVal = (selectedPrice / BASE_PRICE) * 100;
+      pvSlipVal.textContent = selectedPrice + ' USDT (' + parseFloat(pctVal.toFixed(4)) + '%)';
       const maxPrice = side === 'buy' ? BASE_PRICE + selectedPrice : BASE_PRICE - selectedPrice;
       pvExecVal.textContent = maxPrice.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' USDT';
     }
