@@ -1283,7 +1283,7 @@ svg { display: block; }
             </div>
             <span class="check-label dashed" id="slippageInfoBtn">Max slippage</span>
             <div class="slippage-val-btn" id="slippageValBtn">
-              <span class="val-text mono" id="slippageValText">0.02%</span>
+              <span class="val-text mono" id="slippageValText">0.5%</span>
               <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6.5L7 4" stroke="#959595" stroke-width="1" stroke-linecap="round"/></svg>
             </div>
           </div>
@@ -1295,10 +1295,10 @@ svg { display: block; }
               <span class="slip-dd-seg" data-mode="price">By Price</span>
             </div>
             <div class="slip-dd-list" id="ddPercentList">
-              <div class="slip-dd-item" data-value="0.01"><span>0.01%</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-              <div class="slip-dd-item selected" data-value="0.02"><span>0.02%</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-              <div class="slip-dd-item" data-value="0.05"><span>0.05%</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="slip-dd-item" data-value="0.1"><span>0.1%</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="slip-dd-item" data-value="0.3"><span>0.3%</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="slip-dd-item selected" data-value="0.5"><span>0.5%</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="slip-dd-item" data-value="1"><span>1.0%</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="slip-dd-item cust-trigger" id="ddCustPercent"><span>Customize</span></div>
             </div>
             <div class="slip-dd-list" id="ddPriceList" style="display:none">
@@ -1432,7 +1432,7 @@ svg { display: block; }
         <div class="pv-slip-divider" id="pvSlipDivider"></div>
         <div class="pv-row pv-slip-row" id="pvSlipRow">
           <span class="pv-row-label">Max slippage</span>
-          <span class="pv-row-value mono" id="pvSlipVal">0.02%</span>
+          <span class="pv-row-value mono" id="pvSlipVal">0.5%</span>
         </div>
         <div class="pv-row pv-slip-row" id="pvExecRow">
           <span class="pv-row-label">Max exec. price</span>
@@ -1461,11 +1461,11 @@ svg { display: block; }
         </button>
       </div>
       <div class="cust-input-wrap" id="custInputWrap">
-        <span class="cust-hint" id="custHint">0.01% – 10%</span>
+        <span class="cust-hint" id="custHint">0.1% – 5.0%</span>
         <input type="text" inputmode="decimal" id="custInput" class="mono">
         <span class="cust-unit" id="custUnit">%</span>
       </div>
-      <div class="cust-range" id="custRange">Range: 0.01% – 10%</div>
+      <div class="cust-range" id="custRange">Range: 0.1% – 5.0%</div>
       <button class="cust-confirm" id="custConfirm">Confirm</button>
     </div>
   </div>
@@ -1496,7 +1496,7 @@ const BASE_PRICE = 122023.5;
 /* ===== State ===== */
 let slippageEnabled = false;
 let currentMode = 'percent';    // 'percent' | 'price'
-let selectedPercent = 0.02;     // default
+let selectedPercent = 0.5;      // default
 let selectedPrice = null;        // no default — user must choose
 let isCustomPercent = false;
 let isCustomPrice = false;
@@ -1652,8 +1652,8 @@ function openCustomize(mode) {
 
   if (mode === 'percent') {
     custUnit.textContent = '%';
-    custHint.textContent = '0.01% – 10%';
-    custRange.textContent = 'Range: 0.01% – 10%';
+    custHint.textContent = '0.1% – 5.0%';
+    custRange.textContent = 'Range: 0.1% – 5.0%';
     custRange.style.display = '';
   } else {
     custUnit.textContent = 'USDT';
@@ -1682,7 +1682,7 @@ custInput.addEventListener('input', function() {
   // Auto-clamp to max on typing
   const val = parseFloat(this.value);
   if (!isNaN(val)) {
-    const max = custMode === 'percent' ? 10 : 1000;
+    const max = custMode === 'percent' ? 5 : 1000;
     if (val > max) {
       this.value = String(max);
     }
@@ -1694,7 +1694,7 @@ document.getElementById('custConfirm').addEventListener('click', function() {
   if (isNaN(val) || val <= 0) return;
 
   if (custMode === 'percent') {
-    val = Math.max(0.01, Math.min(val, 10));
+    val = Math.max(0.1, Math.min(val, 5));
     selectedPercent = val;
     isCustomPercent = true;
     currentMode = 'percent';
@@ -1722,7 +1722,7 @@ function updateDisplay() {
 
 function resetDefaults() {
   currentMode = 'percent';
-  selectedPercent = 0.02;
+  selectedPercent = 0.5;
   selectedPrice = null;
   isCustomPercent = false;
   isCustomPrice = false;
@@ -1790,7 +1790,17 @@ function closePreview() {
   pvOverlay.classList.remove('open');
 }
 document.getElementById('pvBackdrop').addEventListener('click', closePreview);
-pvCta.addEventListener('click', closePreview);
+pvCta.addEventListener('click', function() {
+  closePreview();
+  // After order: reset slippage input (PRD requirement)
+  slippageEnabled = false;
+  slippageCheck.classList.remove('checked');
+  slippageValBtn.classList.remove('visible');
+  closeDropdown();
+  resetDefaults();
+  syncDdSelection();
+  updateDisplay();
+});
 document.getElementById('pvSkipCheck').parentElement.addEventListener('click', function() {
   document.getElementById('pvSkipCheck').classList.toggle('checked');
 });

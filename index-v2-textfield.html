@@ -1274,7 +1274,7 @@ svg { display: block; }
           <div class="slip-input-row" id="slipInputRow">
             <div class="slip-input-group" id="slipInputGroup">
               <span class="slip-mode-label" id="slipModeLabel">By Percent</span>
-              <input type="text" inputmode="none" class="slip-field" id="slipField" value="0.02" placeholder="By Percent">
+              <input type="text" inputmode="none" class="slip-field" id="slipField" value="0.5" placeholder="By Percent">
               <div class="slip-unit-btn" id="slipUnitBtn">
                 <span id="slipUnitText">%</span>
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6.5L7 4" stroke="#959595" stroke-width="1" stroke-linecap="round"/></svg>
@@ -1291,7 +1291,7 @@ svg { display: block; }
                 <svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
               </div>
             </div>
-            <span class="slip-range-hint" id="slipRangeHint">Range: 0.01% – 10%</span>
+            <span class="slip-range-hint" id="slipRangeHint">Range: 0.1% – 5.0%</span>
           </div>
         </div>
 
@@ -1439,7 +1439,7 @@ svg { display: block; }
         <div class="pv-slip-divider" id="pvSlipDivider"></div>
         <div class="pv-row pv-slip-row" id="pvSlipRow">
           <span class="pv-row-label">Max slippage</span>
-          <span class="pv-row-value mono" id="pvSlipVal">0.02%</span>
+          <span class="pv-row-value mono" id="pvSlipVal">0.5%</span>
         </div>
         <div class="pv-row pv-slip-row" id="pvExecRow">
           <span class="pv-row-label">Max exec. price</span>
@@ -1483,7 +1483,7 @@ const BASE_PRICE = 122023.5;
 /* ===== State ===== */
 let slippageEnabled = false;
 let currentMode = 'percent';    // 'percent' | 'price'
-let selectedPercent = 0.02;     // default
+let selectedPercent = 0.5;      // default
 let selectedPrice = null;        // no default — user must enter
 let unitDdOpen = false;
 
@@ -1554,7 +1554,7 @@ slipField.addEventListener('input', function() {
   // Auto-clamp to max on typing
   const val = parseFloat(this.value);
   if (!isNaN(val)) {
-    const max = currentMode === 'percent' ? 10 : 1000;
+    const max = currentMode === 'percent' ? 5 : 1000;
     if (val > max) {
       this.value = String(max);
     }
@@ -1577,7 +1577,7 @@ function validateAndClamp() {
       val = selectedPercent; // revert to last valid
     } else {
       // Show error state if out of range before clamping
-      if (val < 0.01 || val > 10) {
+      if (val < 0.1 || val > 5) {
         slipInputGroup.classList.add('error');
         slipRangeHint.classList.add('error');
         setTimeout(() => {
@@ -1585,7 +1585,7 @@ function validateAndClamp() {
           slipRangeHint.classList.remove('error');
         }, 1200);
       }
-      val = Math.max(0.01, Math.min(val, 10));
+      val = Math.max(0.1, Math.min(val, 5));
     }
     selectedPercent = val;
     // Format: remove trailing zeros but keep meaningful decimals
@@ -1680,7 +1680,7 @@ function syncInputDisplay() {
   if (currentMode === 'percent') {
     slipUnitText.textContent = '%';
     slipField.value = formatNum(selectedPercent);
-    slipRangeHint.textContent = 'Range: 0.01% – 10%';
+    slipRangeHint.textContent = 'Range: 0.1% – 5.0%';
     slipRangeHint.style.display = '';
   } else {
     slipUnitText.textContent = 'USDT';
@@ -1695,7 +1695,7 @@ function syncInputDisplay() {
 
 function resetDefaults() {
   currentMode = 'percent';
-  selectedPercent = 0.02;
+  selectedPercent = 0.5;
   selectedPrice = null;
 }
 
@@ -1806,7 +1806,16 @@ function closePreview() {
   pvOverlay.classList.remove('open');
 }
 document.getElementById('pvBackdrop').addEventListener('click', closePreview);
-pvCta.addEventListener('click', closePreview);
+pvCta.addEventListener('click', function() {
+  closePreview();
+  // After order: reset slippage input (PRD requirement)
+  slippageEnabled = false;
+  slippageCheck.classList.remove('checked');
+  slipInputRow.classList.remove('visible');
+  closeUnitDd();
+  resetDefaults();
+  syncInputDisplay();
+});
 document.getElementById('pvSkipCheck').parentElement.addEventListener('click', function() {
   document.getElementById('pvSkipCheck').classList.toggle('checked');
 });
