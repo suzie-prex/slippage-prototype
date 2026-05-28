@@ -545,6 +545,7 @@ body {
   border: 1px solid var(--border);
   border-radius: 8px;
   transition: border-color 0.15s;
+  position: relative;
 }
 .slip-input-group.focus { border-color: rgba(247,247,247,0.5); }
 .slip-input-group.error { border-color: var(--negative); }
@@ -621,6 +622,85 @@ body {
   transition: color 0.15s;
 }
 .slip-range-hint.error { color: var(--negative); }
+
+/* Floating mode label */
+.slip-mode-label {
+  position: absolute;
+  left: 12px;
+  top: 2px;
+  font-size: 9px;
+  color: var(--text-m);
+  letter-spacing: 0.02em;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+.slip-input-group.has-label .slip-mode-label { opacity: 1; }
+.slip-input-group.has-label .slip-field {
+  padding-top: 10px;
+  font-size: 12px;
+}
+
+/* Number Keypad */
+.num-keypad-wrap {
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  width: 360px;
+  z-index: 500;
+  background: #2c2c2e;
+  transform: translateX(-50%) translateY(100%);
+  transition: transform 0.32s cubic-bezier(0.32, 0.72, 0, 1);
+}
+.num-keypad-wrap.open {
+  transform: translateX(-50%) translateY(0);
+}
+.num-keypad-done {
+  padding: 8px 16px;
+  border-top: 1px solid rgba(255,255,255,0.06);
+}
+.num-keypad-done button {
+  width: 100%;
+  height: 44px;
+  border-radius: 8px;
+  border: none;
+  background: var(--blue);
+  color: #fff;
+  font-family: inherit;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.num-keypad-done button:active { opacity: 0.8; }
+.num-keypad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+  padding: 6px 4px 28px;
+}
+.num-key {
+  height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: #3a3a3c;
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 22px;
+  font-weight: 400;
+  color: #fff;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.08s;
+}
+.num-key:active { background: #545456; }
+.num-key.fn {
+  background: transparent;
+}
+.num-key.fn:active { background: rgba(255,255,255,0.06); }
+
 /* === Order Info + Buttons === */
 .order-info-section {
   display: flex;
@@ -1193,7 +1273,8 @@ svg { display: block; }
           <!-- Inline Input Row -->
           <div class="slip-input-row" id="slipInputRow">
             <div class="slip-input-group" id="slipInputGroup">
-              <input type="text" inputmode="decimal" class="slip-field" id="slipField" value="0.02" placeholder="0.02">
+              <span class="slip-mode-label" id="slipModeLabel">By Percent</span>
+              <input type="text" inputmode="none" class="slip-field" id="slipField" value="0.02" placeholder="By Percent">
               <div class="slip-unit-btn" id="slipUnitBtn">
                 <span id="slipUnitText">%</span>
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6.5L7 4" stroke="#959595" stroke-width="1" stroke-linecap="round"/></svg>
@@ -1298,6 +1379,29 @@ svg { display: block; }
     </div>
   </div>
 
+  <!-- Number Keypad -->
+  <div class="num-keypad-wrap" id="numKeypad">
+    <div class="num-keypad-done">
+      <button id="keypadDone">Done</button>
+    </div>
+    <div class="num-keypad">
+      <button class="num-key" data-val="1">1</button>
+      <button class="num-key" data-val="2">2</button>
+      <button class="num-key" data-val="3">3</button>
+      <button class="num-key" data-val="4">4</button>
+      <button class="num-key" data-val="5">5</button>
+      <button class="num-key" data-val="6">6</button>
+      <button class="num-key" data-val="7">7</button>
+      <button class="num-key" data-val="8">8</button>
+      <button class="num-key" data-val="9">9</button>
+      <button class="num-key fn" data-val=".">.</button>
+      <button class="num-key" data-val="0">0</button>
+      <button class="num-key fn" id="keypadBack">
+        <svg width="24" height="18" viewBox="0 0 24 18" fill="none"><path d="M8.5 1.5H20.5C21.6 1.5 22.5 2.4 22.5 3.5V14.5C22.5 15.6 21.6 16.5 20.5 16.5H8.5L1.5 9L8.5 1.5Z" stroke="#eee" stroke-width="1.3" stroke-linejoin="round"/><path d="M12.5 6.5L17.5 11.5M17.5 6.5L12.5 11.5" stroke="#eee" stroke-width="1.3" stroke-linecap="round"/></svg>
+      </button>
+    </div>
+  </div>
+
   <!-- Order Preview Bottom Sheet -->
   <div class="pv-overlay" id="pvOverlay">
     <div class="pv-backdrop" id="pvBackdrop"></div>
@@ -1392,6 +1496,8 @@ const slipUnitBtn    = document.getElementById('slipUnitBtn');
 const slipUnitText   = document.getElementById('slipUnitText');
 const slipUnitDd     = document.getElementById('slipUnitDd');
 const slipRangeHint  = document.getElementById('slipRangeHint');
+const slipModeLabel  = document.getElementById('slipModeLabel');
+const numKeypad      = document.getElementById('numKeypad');
 
 /* ===== TP/SL checkbox (dummy) ===== */
 document.getElementById('tpslRow').addEventListener('click', function() {
@@ -1418,16 +1524,26 @@ document.getElementById('slippageRow').addEventListener('click', function(e) {
 });
 
 /* ===== Input field behavior ===== */
+let blurTimer = null;
+
 slipField.addEventListener('focus', function() {
+  if (blurTimer) { clearTimeout(blurTimer); blurTimer = null; }
   slipInputGroup.classList.add('focus');
   slipInputGroup.classList.remove('error');
   slipRangeHint.classList.remove('error');
   this.select();
+  showKeypad();
+  updateFloatingLabel();
 });
 
 slipField.addEventListener('blur', function() {
   slipInputGroup.classList.remove('focus');
-  validateAndClamp();
+  blurTimer = setTimeout(() => {
+    blurTimer = null;
+    validateAndClamp();
+    hideKeypad();
+    updateFloatingLabel();
+  }, 120);
 });
 
 slipField.addEventListener('input', function() {
@@ -1444,6 +1560,7 @@ slipField.addEventListener('input', function() {
       this.value = String(max);
     }
   }
+  updateFloatingLabel();
 });
 
 slipField.addEventListener('keydown', function(e) {
@@ -1557,21 +1674,24 @@ document.addEventListener('click', function(e) {
 
 /* ===== Display sync ===== */
 function syncInputDisplay() {
+  const modeLabel = currentMode === 'percent' ? 'By Percent' : 'By Price';
+  slipModeLabel.textContent = modeLabel;
+  slipField.placeholder = modeLabel;
+
   if (currentMode === 'percent') {
     slipUnitText.textContent = '%';
     slipField.value = formatNum(selectedPercent);
-    slipField.placeholder = '0.02';
     slipRangeHint.textContent = 'Range: 0.01% – 10%';
     slipRangeHint.style.display = '';
   } else {
     slipUnitText.textContent = 'USDT';
     slipField.value = selectedPrice !== null ? formatNum(selectedPrice) : '';
-    slipField.placeholder = '';
     slipRangeHint.textContent = 'Auto-capped at max';
     slipRangeHint.style.display = '';
   }
   slipInputGroup.classList.remove('error');
   slipRangeHint.classList.remove('error');
+  updateFloatingLabel();
 }
 
 function resetDefaults() {
@@ -1579,6 +1699,51 @@ function resetDefaults() {
   selectedPercent = 0.02;
   selectedPrice = null;
 }
+
+/* ===== Floating Label ===== */
+function updateFloatingLabel() {
+  const hasValue = slipField.value.length > 0;
+  slipInputGroup.classList.toggle('has-label', hasValue);
+}
+
+/* ===== Number Keypad ===== */
+function showKeypad() {
+  numKeypad.classList.add('open');
+}
+function hideKeypad() {
+  numKeypad.classList.remove('open');
+}
+
+/* Prevent blur when tapping keypad buttons */
+numKeypad.addEventListener('mousedown', function(e) {
+  e.preventDefault();
+});
+numKeypad.addEventListener('touchstart', function(e) {
+  e.preventDefault();
+}, { passive: false });
+
+/* Number key input */
+numKeypad.querySelectorAll('.num-key[data-val]').forEach(function(key) {
+  key.addEventListener('click', function() {
+    const val = this.dataset.val;
+    if (val === '.' && slipField.value.includes('.')) return;
+    slipField.value += val;
+    slipField.dispatchEvent(new Event('input'));
+    slipField.focus();
+  });
+});
+
+/* Backspace */
+document.getElementById('keypadBack').addEventListener('click', function() {
+  slipField.value = slipField.value.slice(0, -1);
+  slipField.dispatchEvent(new Event('input'));
+  slipField.focus();
+});
+
+/* Done button */
+document.getElementById('keypadDone').addEventListener('click', function() {
+  slipField.blur();
+});
 
 /* ===== Order Preview ===== */
 const pvOverlay  = document.getElementById('pvOverlay');
@@ -1663,6 +1828,7 @@ document.getElementById('infoClose').addEventListener('click', closeInfo);
 
 /* ===== Init ===== */
 syncInputDisplay();
+updateFloatingLabel();
 </script>
 </body>
 </html>
