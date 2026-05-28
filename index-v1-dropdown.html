@@ -876,6 +876,172 @@ body {
 .oc-pnl.positive { color: var(--positive); }
 .oc-pnl.negative { color: var(--negative); }
 
+/* === Order Preview Bottom Sheet === */
+.pv-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 1000;
+  display: none;
+  justify-content: center;
+}
+.pv-overlay.open { display: flex; }
+.pv-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.55);
+  animation: custFadeIn 0.2s ease;
+}
+.pv-sheet {
+  position: fixed;
+  bottom: 0;
+  width: 360px;
+  background: var(--bg1);
+  border-radius: 16px 16px 0 0;
+  padding: 0 20px 34px;
+  animation: custSlideUp 0.25s cubic-bezier(0.32,0.72,0,1);
+  z-index: 1001;
+}
+.pv-handle {
+  width: 36px;
+  height: 4px;
+  border-radius: 2px;
+  background: var(--text-m);
+  margin: 10px auto 20px;
+}
+.pv-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding-bottom: 16px;
+}
+.pv-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: #f7931a;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  margin-bottom: 4px;
+}
+.pv-asset {
+  font-size: 18px;
+  font-weight: 700;
+  color: #f7f7f7;
+}
+.pv-perp {
+  font-size: 14px;
+  color: var(--text-s);
+  font-weight: 500;
+}
+.pv-badges {
+  display: flex;
+  gap: 6px;
+  margin-top: 4px;
+}
+.pv-badge {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 10px;
+  border-radius: 100px;
+  border: 1px solid;
+}
+.pv-badge.long {
+  color: var(--positive);
+  border-color: rgba(52,199,89,0.3);
+  background: rgba(52,199,89,0.08);
+}
+.pv-badge.short {
+  color: var(--negative);
+  border-color: rgba(255,73,63,0.3);
+  background: rgba(255,73,63,0.08);
+}
+.pv-badge.neutral {
+  color: var(--text-s);
+  border-color: var(--border);
+  background: none;
+}
+.pv-info {
+  border-top: 1px solid var(--border);
+  padding: 14px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.pv-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 9px 0;
+}
+.pv-row-label {
+  font-size: 13px;
+  color: var(--text-t);
+}
+.pv-row-label a {
+  color: var(--text-t);
+  text-decoration: none;
+  border-bottom: 1px dashed var(--text-m);
+}
+.pv-row-value {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f7f7f7;
+  text-align: right;
+}
+.pv-row-sub {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--text-t);
+  margin-top: 2px;
+}
+.pv-liq {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--positive);
+  text-align: right;
+  padding: 2px 0 4px;
+}
+.pv-liq.sell { color: var(--negative); }
+.pv-slip-row { display: none; }
+.pv-slip-row.visible { display: flex; }
+.pv-slip-divider {
+  display: none;
+  height: 1px;
+  background: rgba(255,255,255,0.04);
+  margin: 2px 0;
+}
+.pv-slip-divider.visible { display: block; }
+.pv-skip {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 16px 0;
+}
+.pv-skip-text {
+  font-size: 12px;
+  color: var(--text-m);
+  line-height: 18px;
+}
+.pv-cta {
+  width: 100%;
+  height: 48px;
+  border-radius: 10px;
+  border: none;
+  font-size: 15px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  font-family: inherit;
+}
+.pv-cta.buy { background: var(--positive); }
+.pv-cta.sell { background: var(--negative); }
+.pv-cta:active { opacity: 0.85; }
+
 /* === Info Bottom Sheet === */
 .info-overlay {
   position: fixed;
@@ -1229,6 +1395,61 @@ svg { display: block; }
     </div>
   </div>
 
+  <!-- Order Preview Bottom Sheet -->
+  <div class="pv-overlay" id="pvOverlay">
+    <div class="pv-backdrop" id="pvBackdrop"></div>
+    <div class="pv-sheet">
+      <div class="pv-handle"></div>
+      <div class="pv-header">
+        <div class="pv-icon">B</div>
+        <span class="pv-asset">BTC</span>
+        <span class="pv-perp">Perpetual</span>
+        <div class="pv-badges">
+          <span class="pv-badge long" id="pvDirBadge">Long ↗</span>
+          <span class="pv-badge neutral">Isolated 100x</span>
+        </div>
+      </div>
+      <div class="pv-info">
+        <div class="pv-row">
+          <span class="pv-row-label">Quantity</span>
+          <div class="pv-row-value">
+            <div class="mono">0.050 BTC</div>
+            <div class="pv-row-sub mono">≈ 6,101.18 USDT</div>
+          </div>
+        </div>
+        <div class="pv-row">
+          <span class="pv-row-label">Est. margin</span>
+          <span class="pv-row-value mono">61.01 USDT</span>
+        </div>
+        <div class="pv-row">
+          <span class="pv-row-label"><a href="#">Trading fee ↗</a></span>
+          <span class="pv-row-value mono">0.06%</span>
+        </div>
+        <div class="pv-row">
+          <span class="pv-row-label">Est. price</span>
+          <span class="pv-row-value mono">122,023.5 USDT</span>
+        </div>
+        <div class="pv-slip-divider" id="pvSlipDivider"></div>
+        <div class="pv-row pv-slip-row" id="pvSlipRow">
+          <span class="pv-row-label">Max slippage</span>
+          <span class="pv-row-value mono" id="pvSlipVal">0.02%</span>
+        </div>
+        <div class="pv-row pv-slip-row" id="pvExecRow">
+          <span class="pv-row-label">Max exec. price</span>
+          <span class="pv-row-value mono" id="pvExecVal">122,047.9 USDT</span>
+        </div>
+      </div>
+      <div class="pv-liq mono" id="pvLiq">Est. liquidation price 118,234.5</div>
+      <div class="pv-skip">
+        <div class="checkbox" id="pvSkipCheck">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </div>
+        <span class="pv-skip-text">Don't show this preview again. You can turn it back on in trade settings.</span>
+      </div>
+      <button class="pv-cta buy" id="pvCta">Buy BTC - Long</button>
+    </div>
+  </div>
+
   <!-- Customize Max. Slippage Bottom Sheet -->
   <div class="cust-overlay" id="custOverlay">
     <div class="cust-backdrop" id="custBackdrop"></div>
@@ -1495,6 +1716,71 @@ function resetDefaults() {
   isCustomPercent = false;
   isCustomPrice = false;
 }
+
+/* ===== Order Preview ===== */
+const pvOverlay  = document.getElementById('pvOverlay');
+const pvDirBadge = document.getElementById('pvDirBadge');
+const pvSlipRow  = document.getElementById('pvSlipRow');
+const pvExecRow  = document.getElementById('pvExecRow');
+const pvSlipDivider = document.getElementById('pvSlipDivider');
+const pvSlipVal  = document.getElementById('pvSlipVal');
+const pvExecVal  = document.getElementById('pvExecVal');
+const pvLiq      = document.getElementById('pvLiq');
+const pvCta      = document.getElementById('pvCta');
+
+document.querySelector('.btn-buy').addEventListener('click', function() { openPreview('buy'); });
+document.querySelector('.btn-sell').addEventListener('click', function() { openPreview('sell'); });
+
+function openPreview(side) {
+  // Direction badge
+  if (side === 'buy') {
+    pvDirBadge.textContent = 'Long ↗';
+    pvDirBadge.className = 'pv-badge long';
+    pvCta.textContent = 'Buy BTC - Long';
+    pvCta.className = 'pv-cta buy';
+    pvLiq.className = 'pv-liq mono';
+  } else {
+    pvDirBadge.textContent = 'Short ↘';
+    pvDirBadge.className = 'pv-badge short';
+    pvCta.textContent = 'Sell BTC - Short';
+    pvCta.className = 'pv-cta sell';
+    pvLiq.className = 'pv-liq sell mono';
+  }
+
+  // Slippage rows
+  if (slippageEnabled) {
+    pvSlipRow.classList.add('visible');
+    pvExecRow.classList.add('visible');
+    pvSlipDivider.classList.add('visible');
+
+    // Max slippage display
+    if (currentMode === 'percent') {
+      pvSlipVal.textContent = selectedPercent + '%';
+      const offset = BASE_PRICE * (selectedPercent / 100);
+      const maxPrice = side === 'buy' ? BASE_PRICE + offset : BASE_PRICE - offset;
+      pvExecVal.textContent = maxPrice.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' USDT';
+    } else {
+      pvSlipVal.textContent = selectedPrice + ' USDT';
+      const maxPrice = side === 'buy' ? BASE_PRICE + selectedPrice : BASE_PRICE - selectedPrice;
+      pvExecVal.textContent = maxPrice.toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + ' USDT';
+    }
+  } else {
+    pvSlipRow.classList.remove('visible');
+    pvExecRow.classList.remove('visible');
+    pvSlipDivider.classList.remove('visible');
+  }
+
+  pvOverlay.classList.add('open');
+}
+
+function closePreview() {
+  pvOverlay.classList.remove('open');
+}
+document.getElementById('pvBackdrop').addEventListener('click', closePreview);
+pvCta.addEventListener('click', closePreview);
+document.getElementById('pvSkipCheck').parentElement.addEventListener('click', function() {
+  document.getElementById('pvSkipCheck').classList.toggle('checked');
+});
 
 /* ===== Info Bottom Sheet ===== */
 const infoOverlay = document.getElementById('infoOverlay');
