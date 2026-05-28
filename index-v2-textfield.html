@@ -1380,7 +1380,7 @@ const BASE_PRICE = 122023.5;
 let slippageEnabled = false;
 let currentMode = 'percent';    // 'percent' | 'price'
 let selectedPercent = 0.02;     // default
-let selectedPrice = 10;         // default
+let selectedPrice = null;        // no default — user must enter
 let unitDdOpen = false;
 
 /* ===== DOM refs ===== */
@@ -1467,6 +1467,11 @@ function validateAndClamp() {
     slipField.value = formatNum(val);
   } else {
     if (isNaN(val) || val <= 0) {
+      // If no previous value, keep empty
+      if (selectedPrice === null) {
+        slipField.value = '';
+        return;
+      }
       val = selectedPrice;
     } else {
       if (val < 0.1 || val > 1000) {
@@ -1550,7 +1555,7 @@ function syncInputDisplay() {
     slipRangeHint.textContent = 'Range: 0.01% – 10%';
   } else {
     slipUnitText.textContent = 'USDT';
-    slipField.value = formatNum(selectedPrice);
+    slipField.value = selectedPrice !== null ? formatNum(selectedPrice) : '';
     slipField.placeholder = '10';
     slipRangeHint.textContent = 'Range: 0.1 – 1,000.0 USDT';
   }
@@ -1561,7 +1566,7 @@ function syncInputDisplay() {
 function resetDefaults() {
   currentMode = 'percent';
   selectedPercent = 0.02;
-  selectedPrice = 10;
+  selectedPrice = null;
 }
 
 /* ===== Order Preview ===== */
@@ -1594,8 +1599,9 @@ function openPreview(side) {
     pvLiq.className = 'pv-liq sell mono';
   }
 
-  // Slippage rows
-  if (slippageEnabled) {
+  // Slippage rows — show only when value is actually set
+  const hasSlippage = slippageEnabled && (currentMode === 'percent' || selectedPrice !== null);
+  if (hasSlippage) {
     pvSlipRow.classList.add('visible');
     pvExecRow.classList.add('visible');
     pvSlipDivider.classList.add('visible');

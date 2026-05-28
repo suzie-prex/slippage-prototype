@@ -1304,7 +1304,7 @@ svg { display: block; }
             <div class="slip-dd-list" id="ddPriceList" style="display:none">
               <div class="slip-dd-item" data-value="1"><span>1 USDT</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="slip-dd-item" data-value="5"><span>5 USDT</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
-              <div class="slip-dd-item selected" data-value="10"><span>10 USDT</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+              <div class="slip-dd-item" data-value="10"><span>10 USDT</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="slip-dd-item" data-value="20"><span>20 USDT</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="slip-dd-item cust-trigger" id="ddCustPrice"><span>Customize</span></div>
             </div>
@@ -1497,7 +1497,7 @@ const BASE_PRICE = 122023.5;
 let slippageEnabled = false;
 let currentMode = 'percent';    // 'percent' | 'price'
 let selectedPercent = 0.02;     // default
-let selectedPrice = 10;         // default
+let selectedPrice = null;        // no default — user must choose
 let isCustomPercent = false;
 let isCustomPrice = false;
 let ddOpen = false;
@@ -1604,7 +1604,7 @@ function syncDdSelection() {
     const el = ddPercentList.querySelector('.slip-dd-item[data-value="' + selectedPercent + '"]');
     if (el) el.classList.add('selected');
   }
-  if (currentMode === 'price' && !isCustomPrice) {
+  if (currentMode === 'price' && !isCustomPrice && selectedPrice !== null) {
     const el = ddPriceList.querySelector('.slip-dd-item[data-value="' + selectedPrice + '"]');
     if (el) el.classList.add('selected');
   }
@@ -1704,7 +1704,7 @@ function updateDisplay() {
   if (currentMode === 'percent') {
     slippageValText.textContent = selectedPercent + '%';
   } else {
-    slippageValText.textContent = selectedPrice + ' USDT';
+    slippageValText.textContent = selectedPrice !== null ? selectedPrice + ' USDT' : '– USDT';
   }
   syncDdToggle();
 }
@@ -1712,7 +1712,7 @@ function updateDisplay() {
 function resetDefaults() {
   currentMode = 'percent';
   selectedPercent = 0.02;
-  selectedPrice = 10;
+  selectedPrice = null;
   isCustomPercent = false;
   isCustomPrice = false;
 }
@@ -1747,8 +1747,9 @@ function openPreview(side) {
     pvLiq.className = 'pv-liq sell mono';
   }
 
-  // Slippage rows
-  if (slippageEnabled) {
+  // Slippage rows — show only when value is actually set
+  const hasSlippage = slippageEnabled && (currentMode === 'percent' || selectedPrice !== null);
+  if (hasSlippage) {
     pvSlipRow.classList.add('visible');
     pvExecRow.classList.add('visible');
     pvSlipDivider.classList.add('visible');
