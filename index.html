@@ -385,21 +385,9 @@ html, body {
 
         <div class="section-label">Value Input Rules</div>
         <table class="spec-table">
-          <tr><td class="sub-label" colspan="2">Percent 모드 (%)</td></tr>
-          <tr><th>기본값</th><td><code>0.02%</code> (프리셋 선택)</td></tr>
-          <tr><th>범위</th><td><code>0.01%</code> – <code>10%</code></td></tr>
-          <tr><th>프리셋</th><td>0.01 · 0.02 · 0.05 · 0.1 · 0.5 + Customize</td></tr>
-          <tr><th>힌트</th><td><code>Range: 0.01% – 10%</code></td></tr>
-          <tr><td class="sub-label" colspan="2">Price 모드 (USDT)</td></tr>
-          <tr><th>기본값</th><td>없음 (프리셋 미선택 상태)</td></tr>
-          <tr><th>범위</th><td><code>0.1</code> – <code>1,000</code> USDT</td></tr>
-          <tr><th>프리셋</th><td>5 · 10 · 20 · 50 · 100 + Customize</td></tr>
-          <tr><th>힌트</th><td><code>Auto-capped at max</code> (실시간 시세로 범위 변동)</td></tr>
-          <tr><td class="sub-label" colspan="2">공통 (Customize 입력)</td></tr>
-          <tr><th>허용 문자</th><td>숫자 + <code>.</code> 만 허용, 소수점 1개 제한</td></tr>
-          <tr><th>Max 초과</th><td>타이핑 시점에서 즉시 max 값으로 자동 치환</td></tr>
-          <tr><th>Min 미만</th><td>Confirm 시점에서 min으로 클램핑</td></tr>
-          <tr><th>빈 값</th><td>Percent → 마지막 유효값 복원 / Price → empty 유지</td></tr>
+          <tr><th>Percent</th><td>기본 <code>0.02%</code> · 범위 0.01% – 10% · 프리셋 0.01 · 0.02 · 0.05 · 0.1 · 0.5</td></tr>
+          <tr><th>Price</th><td>기본값 없음 · 범위 0.1 – 1,000 USDT · 프리셋 5 · 10 · 20 · 50 · 100</td></tr>
+          <tr><th>초과 처리</th><td>Max 초과 시 즉시 max 값으로 자동 치환</td></tr>
         </table>
 
         <div class="pros-cons">
@@ -463,21 +451,9 @@ html, body {
 
         <div class="section-label">Value Input Rules</div>
         <table class="spec-table">
-          <tr><td class="sub-label" colspan="2">Percent 모드 (%)</td></tr>
-          <tr><th>기본값</th><td><code>0.02%</code></td></tr>
-          <tr><th>범위</th><td><code>0.01%</code> – <code>10%</code></td></tr>
-          <tr><th>힌트</th><td><code>Range: 0.01% – 10%</code></td></tr>
-          <tr><th>입력 방식</th><td>인라인 텍스트 필드 직접 입력</td></tr>
-          <tr><td class="sub-label" colspan="2">Price 모드 (USDT)</td></tr>
-          <tr><th>기본값</th><td>없음 (empty — 유저 직접 입력 필수)</td></tr>
-          <tr><th>범위</th><td><code>0.1</code> – <code>1,000</code> USDT</td></tr>
-          <tr><th>힌트</th><td><code>Auto-capped at max</code> (실시간 시세로 범위 변동)</td></tr>
-          <tr><th>입력 방식</th><td>인라인 텍스트 필드 직접 입력, placeholder 없음</td></tr>
-          <tr><td class="sub-label" colspan="2">공통</td></tr>
-          <tr><th>허용 문자</th><td>숫자 + <code>.</code> 만 허용, 소수점 1개 제한</td></tr>
-          <tr><th>Max 초과</th><td>타이핑 시점에서 즉시 max 값으로 자동 치환</td></tr>
-          <tr><th>Min 미만</th><td>blur 시점에서 min으로 클램핑 + 에러 플래시 (1.2s)</td></tr>
-          <tr><th>빈 값 blur</th><td>Percent → 마지막 유효값 복원 / Price → empty 유지</td></tr>
+          <tr><th>Percent</th><td>기본 <code>0.02%</code> · 범위 0.01% – 10%</td></tr>
+          <tr><th>Price</th><td>기본값 없음 (유저 직접 입력) · 범위 0.1 – 1,000 USDT</td></tr>
+          <tr><th>초과 처리</th><td>Max 초과 시 즉시 max 값으로 자동 치환</td></tr>
         </table>
 
         <div class="pros-cons">
