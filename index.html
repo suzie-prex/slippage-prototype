@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=360, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Market Order — Slippage Tolerance</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net">
+<link href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/static/pretendard.css" rel="stylesheet">
+<style>
+:root {
+  --bg0: #111111;
+  --bg1: #1c1c1c;
+  --bg2: #2a2a2a;
+  --bg3: #3a3a3a;
+  --text-p: #eeeeee;
+  --text-s: #b4b4b4;
+  --text-t: #959595;
+  --text-m: #7b7b7b;
+  --positive: #34c759;
+  --negative: #ff493f;
+  --blue: #0a84ff;
+  --border: #2a2a2a;
+  --sell-tint: rgba(255,59,48,0.12);
+  --buy-tint: rgba(52,199,89,0.12);
+  --chip-bg: rgba(238,238,238,0.1);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  background: #0e0e11;
+  font-family: 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  color: var(--text-p);
+  -webkit-font-smoothing: antialiased;
+}
+body {
+  display: flex;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.phone {
+  width: 360px;
+  min-height: 100vh;
+  background: var(--bg0);
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Monospace number styling */
+.mono {
+  font-feature-settings: 'lnum' 1, 'tnum' 1;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+
+/* === Status Bar === */
+.status-bar {
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  font-size: 12px;
+  color: #fff;
+  font-family: 'Roboto', sans-serif;
+}
+.status-icons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.status-icons svg { display: block; }
+
+/* === Top App Bar === */
+.top-bar {
+  height: 42px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+}
+.top-bar-left {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 0 4px;
+}
+.top-bar-title {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.top-bar-title .symbol {
+  font-size: 18px;
+  font-weight: 600;
+  color: #f7f7f7;
+  letter-spacing: -0.09px;
+}
+.badge-perp {
+  border: 1px solid #424242;
+  border-radius: 1000px;
+  padding: 2px 8px;
+  font-size: 11px;
+  color: var(--text-s);
+  letter-spacing: 0.11px;
+  line-height: 14px;
+}
+.search-btn {
+  background: var(--bg1);
+  border-radius: 4px;
+  width: 20px;
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.top-bar-pnl {
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--positive);
+  letter-spacing: 0.1px;
+  line-height: 12px;
+}
+.top-bar-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.seg-control {
+  display: flex;
+  background: var(--bg1);
+  border-radius: 1000px;
+  padding: 3px 4px;
+  gap: 0;
+}
+.seg-item {
+  width: 38px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 1000px;
+  cursor: pointer;
+}
+.seg-item.active { background: var(--bg3); }
+.seg-item svg { display: block; }
+.icon-btn {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* === Order Section === */
+.order-section {
+  display: flex;
+  padding: 19px 16px 0;
+  gap: 16px;
+  align-items: stretch;
+}
+
+/* Orderbook */
+.orderbook {
+  width: 136px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.ob-stretch {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+.ob-buy-list {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+}
+.ob-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.ob-meta-label {
+  font-size: 10px;
+  color: var(--text-m);
+  letter-spacing: 0.1px;
+  line-height: 12px;
+  text-align: right;
+}
+.ob-meta-value {
+  font-size: 10px;
+  color: #f7f7f7;
+  letter-spacing: 0.1px;
+  line-height: 12px;
+}
+.ob-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.ob-header-col {
+  font-size: 10px;
+  color: var(--text-m);
+  letter-spacing: 0.1px;
+  line-height: 12px;
+}
+.ob-header-col.right {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+}
+.ob-list { display: flex; flex-direction: column; }
+.ob-row {
+  height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-right: 8px;
+  position: relative;
+  border-radius: 4px 0 0 4px;
+}
+.ob-row .price {
+  font-size: 11px;
+  letter-spacing: 0.11px;
+  line-height: 14px;
+  position: relative;
+  z-index: 1;
+}
+.ob-row .amount {
+  font-size: 11px;
+  color: #f7f7f7;
+  letter-spacing: 0.11px;
+  line-height: 14px;
+  text-align: right;
+  position: relative;
+  z-index: 1;
+}
+.ob-row .bar {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 20px;
+  border-radius: 4px 0 0 4px;
+}
+.ob-row.sell .price { color: var(--negative); }
+.ob-row.sell .bar { background: var(--sell-tint); }
+.ob-row.buy .price { color: var(--positive); }
+.ob-row.buy .bar { background: var(--buy-tint); }
+
+/* Mid price */
+.ob-mid {
+  padding: 4px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+.ob-mid-price {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--negative);
+  line-height: 24px;
+}
+.ob-mid-mark {
+  font-size: 11px;
+  color: var(--text-t);
+  letter-spacing: 0.11px;
+  line-height: 14px;
+  border-bottom: 1px dashed var(--text-t);
+  display: inline-block;
+  align-self: flex-start;
+}
+
+/* Buy/Sell ratio bar */
+.ratio-bar-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ratio-bar {
+  height: 21px;
+  border-radius: 4px;
+  overflow: hidden;
+  position: relative;
+  display: flex;
+}
+.ratio-buy {
+  background: var(--positive);
+  opacity: 0.85;
+  border-radius: 4px 12px 12px 4px;
+  position: relative;
+  z-index: 1;
+}
+.ratio-sell {
+  background: var(--negative);
+  opacity: 0.85;
+  border-radius: 12px 4px 4px 12px;
+  margin-left: -14px;
+  flex: 1;
+}
+.ratio-label {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  display: flex;
+  gap: 4px;
+  z-index: 2;
+}
+.ratio-label.buy-label { left: 6px; color: var(--positive); }
+.ratio-label.sell-label { right: 4px; color: var(--negative); }
+.depth-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.depth-label {
+  font-size: 10px;
+  color: var(--text-m);
+  line-height: 12px;
+}
+.depth-chip {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  font-size: 10px;
+  color: #f7f7f7;
+  letter-spacing: 0.1px;
+}
+
+/* === Order Form === */
+.order-form {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* Dropdowns */
+.form-dropdowns {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.dd-row {
+  display: flex;
+  gap: 8px;
+}
+.dd-chip {
+  height: 32px;
+  background: var(--chip-bg);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding: 8px 2px 8px 12px;
+  font-size: 14px;
+  color: var(--text-p);
+  cursor: pointer;
+  min-width: 0;
+}
+.dd-chip.flex-1 { flex: 1; }
+.dd-chip .label { flex: 1; }
+.dd-chip .chevron {
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.dd-chip.w-fixed { width: 71px; }
+
+/* Text input */
+.text-input {
+  height: 40px;
+  background: var(--chip-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  padding: 0 8px 0 12px;
+  min-width: 0;
+}
+.text-input input {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 14px;
+  color: var(--text-p);
+  font-family: inherit;
+  letter-spacing: -0.21px;
+}
+.text-input input::placeholder {
+  color: var(--text-m);
+}
+.text-input .unit {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-p);
+  padding: 0 4px;
+}
+
+/* Slider */
+.slider-wrap {
+  padding: 6px 0;
+  display: flex;
+  align-items: center;
+}
+.slider-track {
+  flex: 1;
+  display: flex;
+  align-items: center;
+}
+.slider-dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #424242;
+  background: var(--bg0);
+  flex-shrink: 0;
+  margin: 0 -1px;
+  position: relative;
+  z-index: 2;
+}
+.slider-dot.active {
+  background: #f7f7f7;
+  border-color: #f7f7f7;
+  width: 14px;
+  height: 14px;
+}
+.slider-dot.small {
+  width: 10px;
+  height: 10px;
+}
+.slider-line {
+  flex: 1;
+  height: 2px;
+  background: #424242;
+}
+
+/* Available / checkboxes area */
+.form-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.avbl-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.avbl-label {
+  flex: 1;
+  font-size: 11px;
+  color: var(--text-t);
+  letter-spacing: 0.11px;
+  line-height: 14px;
+}
+.avbl-value {
+  font-size: 11px;
+  color: #f7f7f7;
+  letter-spacing: 0.11px;
+  line-height: 14px;
+  white-space: nowrap;
+}
+.info-value {
+  white-space: nowrap;
+}
+.avbl-plus {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Checkbox row */
+.check-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 16px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  min-width: 0;
+}
+.checkbox {
+  width: 16px;
+  height: 16px;
+  border-radius: 4px;
+  border: 1px solid var(--text-s);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  transition: all 0.15s;
+}
+.checkbox.checked {
+  background: #f7f7f7;
+  border-color: #f7f7f7;
+}
+.checkbox svg { display: none; }
+.checkbox.checked svg { display: block; }
+.check-label {
+  font-size: 11px;
+  color: #f7f7f7;
+  letter-spacing: 0.11px;
+  line-height: 14px;
+  white-space: nowrap;
+}
+.check-label.dashed {
+  border-bottom: 1px dashed var(--text-t);
+  padding-bottom: 1px;
+}
+
+/* === Slippage Inline Input Section === */
+.slip-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.slip-input-row {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  position: relative;
+}
+.slip-input-row.visible { display: flex; }
+
+.slip-input-group {
+  display: flex;
+  height: 36px;
+  background: var(--bg0);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: border-color 0.15s;
+}
+.slip-input-group.focus { border-color: rgba(247,247,247,0.5); }
+.slip-input-group.error { border-color: var(--negative); }
+
+.slip-field {
+  flex: 1;
+  min-width: 0;
+  background: none;
+  border: none;
+  outline: none;
+  font-size: 13px;
+  color: var(--text-p);
+  text-align: left;
+  padding: 0 12px;
+  font-family: inherit;
+  font-feature-settings: 'lnum' 1, 'tnum' 1;
+  font-variant-numeric: lining-nums tabular-nums;
+}
+.slip-field::placeholder { color: var(--text-m); }
+
+.slip-unit-btn {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 0 10px;
+  cursor: pointer;
+  background: rgba(238,238,238,0.06);
+  border-left: 1px solid var(--border);
+  border-radius: 0 8px 8px 0;
+  font-size: 12px;
+  color: var(--text-s);
+  white-space: nowrap;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s;
+}
+.slip-unit-btn:active { background: rgba(238,238,238,0.12); }
+
+/* Unit dropdown */
+.slip-unit-dd {
+  position: absolute;
+  right: 0;
+  top: 40px;
+  min-width: 120px;
+  background: var(--bg3);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 8px;
+  z-index: 200;
+  display: none;
+  overflow: hidden;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.6);
+}
+.slip-unit-dd.open { display: block; }
+.slip-unit-dd-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  font-size: 13px;
+  color: var(--text-s);
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition: background 0.1s;
+}
+.slip-unit-dd-item:active { background: rgba(255,255,255,0.05); }
+.slip-unit-dd-item.selected { color: #f7f7f7; }
+.slip-unit-dd-item .dd-check { display: none; }
+.slip-unit-dd-item.selected .dd-check { display: block; }
+
+.slip-range-hint {
+  font-size: 10px;
+  color: var(--text-m);
+  letter-spacing: 0.1px;
+  line-height: 14px;
+  transition: color 0.15s;
+}
+.slip-range-hint.error { color: var(--negative); }
+/* === Order Info + Buttons === */
+.order-info-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.info-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.info-label {
+  font-size: 11px;
+  color: var(--text-t);
+  letter-spacing: 0.11px;
+  line-height: 14px;
+}
+.info-value {
+  font-size: 12px;
+  color: #f7f7f7;
+  letter-spacing: 0.06px;
+  line-height: 16px;
+}
+.btn-order {
+  height: 32px;
+  border-radius: 8px;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  cursor: pointer;
+  width: 100%;
+  font-family: inherit;
+}
+.btn-buy { background: var(--positive); }
+.btn-sell { background: var(--negative); }
+
+/* === Tab Section === */
+.tab-section {
+  padding: 16px 0 0;
+  border-top: 1px solid var(--border);
+  margin-top: 16px;
+}
+.tab-row {
+  display: flex;
+  padding: 0 16px;
+  gap: 0;
+  position: relative;
+}
+.tab-item {
+  padding: 8px 12px;
+  font-size: 12px;
+  color: var(--text-m);
+  letter-spacing: 0.06px;
+  cursor: pointer;
+  position: relative;
+}
+.tab-item.active {
+  color: #f7f7f7;
+  font-weight: 600;
+}
+.tab-item.active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 12px;
+  right: 12px;
+  height: 2px;
+  background: #f7f7f7;
+  border-radius: 1px;
+}
+.tab-actions {
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.tab-actions a {
+  font-size: 12px;
+  color: var(--blue);
+  text-decoration: none;
+}
+
+/* === Dummy Order Cards === */
+.order-cards {
+  padding: 12px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.order-card {
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+}
+.oc-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+.oc-pair {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.oc-symbol {
+  font-size: 13px;
+  font-weight: 600;
+  color: #f7f7f7;
+}
+.oc-badge {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 100px;
+  font-weight: 600;
+}
+.oc-badge.long { background: rgba(52,199,89,0.15); color: var(--positive); }
+.oc-badge.short { background: rgba(255,73,63,0.15); color: var(--negative); }
+.oc-type {
+  font-size: 10px;
+  color: var(--text-m);
+  letter-spacing: 0.1px;
+}
+.oc-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px 16px;
+}
+.oc-field-label {
+  font-size: 10px;
+  color: var(--text-m);
+  letter-spacing: 0.1px;
+  line-height: 12px;
+}
+.oc-field-value {
+  font-size: 11px;
+  color: #f7f7f7;
+  letter-spacing: 0.11px;
+  line-height: 14px;
+  margin-top: 1px;
+}
+.oc-pnl {
+  font-size: 11px;
+  font-weight: 600;
+}
+.oc-pnl.positive { color: var(--positive); }
+.oc-pnl.negative { color: var(--negative); }
+
+/* === Info Bottom Sheet === */
+@keyframes sheetFadeIn {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes sheetSlideUp {
+  from { transform: translateY(100%); } to { transform: translateY(0); }
+}
+.info-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  z-index: 900;
+  display: none;
+  justify-content: center;
+}
+.info-overlay.open { display: flex; }
+.info-backdrop {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.55);
+  animation: sheetFadeIn 0.2s ease;
+}
+.info-sheet {
+  position: fixed;
+  bottom: 0;
+  width: 360px;
+  background: var(--bg1);
+  border-radius: 16px 16px 0 0;
+  padding: 20px 20px 34px;
+  animation: sheetSlideUp 0.25s cubic-bezier(0.32,0.72,0,1);
+  z-index: 901;
+}
+.info-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.info-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #f7f7f7;
+  letter-spacing: -0.015em;
+}
+.info-close {
+  width: 28px; height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+.info-body {
+  font-size: 14px;
+  color: var(--text-s);
+  line-height: 22px;
+}
+.info-body p {
+  margin: 0 0 16px;
+}
+.info-body p:last-of-type {
+  margin-bottom: 0;
+}
+
+/* SVG icons */
+svg { display: block; }
+</style>
+</head>
+<body>
+<div class="phone">
+
+  <!-- Status Bar -->
+  <div class="status-bar">
+    <span class="mono">09:30 PM</span>
+    <div class="status-icons">
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M7 1.75L10.5 5.25H8.75V8.75H5.25V5.25H3.5L7 1.75Z" fill="white" opacity="0.6"/></svg>
+      <svg width="15" height="14" viewBox="0 0 15 14" fill="none"><path d="M1 10.5H3V12.25H1V10.5ZM4.5 7.875H6.5V12.25H4.5V7.875ZM8 5.25H10V12.25H8V5.25ZM11.5 1.75H13.5V12.25H11.5V1.75Z" fill="white"/></svg>
+      <svg width="18" height="11" viewBox="0 0 18 11" fill="none"><rect x="0.5" y="0.5" width="15" height="10" rx="2" stroke="white" stroke-opacity="0.6"/><rect x="2" y="2" width="12" height="7" rx="1" fill="white"/><path d="M17 3.5V7.5" stroke="white" stroke-opacity="0.4" stroke-width="1.5" stroke-linecap="round"/></svg>
+    </div>
+  </div>
+
+  <!-- Top App Bar -->
+  <div class="top-bar">
+    <div class="top-bar-left">
+      <div class="top-bar-title">
+        <span class="symbol">BTC</span>
+        <span class="badge-perp mono">Perp</span>
+        <div class="search-btn">
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="6" cy="6" r="4.5" stroke="#959595" stroke-width="1.2"/><path d="M9.5 9.5L12 12" stroke="#959595" stroke-width="1.2" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+      <span class="top-bar-pnl mono">+38.20%</span>
+    </div>
+    <div class="top-bar-right">
+      <div class="icon-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 6H20M4 12H20M4 18H20" stroke="#959595" stroke-width="1.5" stroke-linecap="round"/></svg>
+      </div>
+      <div class="seg-control">
+        <div class="seg-item active">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M4 2.5H7.5V15.5H4V2.5ZM10.5 5.5H14V15.5H10.5V5.5Z" stroke="#eee" stroke-width="1.2"/></svg>
+        </div>
+        <div class="seg-item">
+          <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M5 3V15M9 5V13M13 7V11" stroke="#7b7b7b" stroke-width="1.5" stroke-linecap="round"/></svg>
+        </div>
+      </div>
+      <div class="icon-btn">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M12 5V19M5 12H19" stroke="#959595" stroke-width="1.5" stroke-linecap="round"/><rect x="3" y="3" width="18" height="18" rx="3" stroke="#959595" stroke-width="1.2"/></svg>
+      </div>
+    </div>
+  </div>
+
+  <!-- Order Section -->
+  <div class="order-section">
+
+    <!-- Orderbook (Left) -->
+    <div class="orderbook">
+      <div class="ob-meta">
+        <span class="ob-meta-label mono">Funding rate / Countdown</span>
+        <span class="ob-meta-value mono">0.0100% / 02:32:50</span>
+      </div>
+
+      <div class="ob-stretch">
+        <div class="ob-header">
+          <span class="ob-header-col mono">Price<br>(USDT)</span>
+          <span class="ob-header-col right mono">Amount<br>(BTC)
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2.5 4L5 6.5L7.5 4" stroke="#7b7b7b" stroke-width="1" stroke-linecap="round"/></svg>
+          </span>
+        </div>
+
+        <!-- Sell orders -->
+        <div class="ob-list" style="margin-top:4px">
+          <div class="ob-row sell"><span class="price mono">122,024.4</span><span class="amount mono">215.95</span><div class="bar" style="width:43px"></div></div>
+          <div class="ob-row sell"><span class="price mono">122,024.1</span><span class="amount mono">6.47K</span><div class="bar" style="width:12px"></div></div>
+          <div class="ob-row sell"><span class="price mono">122,023.8</span><span class="amount mono">215.95</span><div class="bar" style="width:43px"></div></div>
+          <div class="ob-row sell"><span class="price mono">122,023.6</span><span class="amount mono">323.82</span><div class="bar" style="width:60px"></div></div>
+          <div class="ob-row sell"><span class="price mono">122,023.6</span><span class="amount mono">323.82</span><div class="bar" style="width:60px"></div></div>
+          <div class="ob-row sell"><span class="price mono">122,023.6</span><span class="amount mono">323.82</span><div class="bar" style="width:60px"></div></div>
+          <div class="ob-row sell"><span class="price mono">122,023.6</span><span class="amount mono">323.82</span><div class="bar" style="width:60px"></div></div>
+        </div>
+
+        <!-- Mid price -->
+        <div class="ob-mid">
+          <span class="ob-mid-price mono">122,023.5</span>
+          <span class="ob-mid-mark mono">122,023.3</span>
+        </div>
+
+        <!-- Buy orders (stretches with order form) -->
+        <div class="ob-buy-list">
+          <div class="ob-row buy"><span class="price mono">122,023.5</span><span class="amount mono">2.48K</span><div class="bar" style="width:22px"></div></div>
+          <div class="ob-row buy"><span class="price mono">122,023.3</span><span class="amount mono">2.48K</span><div class="bar" style="width:22px"></div></div>
+          <div class="ob-row buy"><span class="price mono">122,022.7</span><span class="amount mono">431.85</span><div class="bar" style="width:53px"></div></div>
+          <div class="ob-row buy"><span class="price mono">122,022.3</span><span class="amount mono">2.48K</span><div class="bar" style="width:22px"></div></div>
+          <div class="ob-row buy"><span class="price mono">122,021.8</span><span class="amount mono">431.85</span><div class="bar" style="width:53px"></div></div>
+          <div class="ob-row buy"><span class="price mono">122,021.4</span><span class="amount mono">6.47K</span><div class="bar" style="width:12px"></div></div>
+          <div class="ob-row buy"><span class="price mono">122,021.2</span><span class="amount mono">215.95</span><div class="bar" style="width:43px"></div></div>
+        </div>
+      </div>
+
+      <!-- Buy/Sell ratio -->
+      <div class="ratio-bar-wrap">
+        <div class="ratio-bar">
+          <div class="ratio-buy" style="width:88px"></div>
+          <div class="ratio-sell"></div>
+          <div class="ratio-label buy-label mono"><span>B</span><span>88%</span></div>
+          <div class="ratio-label sell-label mono"><span>12%</span><span>S</span></div>
+        </div>
+        <div class="depth-row">
+          <span class="depth-label">Depth</span>
+          <div class="depth-chip mono">
+            <span style="padding:0 4px">0.1</span>
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M2.5 4L5 6.5L7.5 4" stroke="#f7f7f7" stroke-width="1" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Form (Right) -->
+    <div class="order-form">
+
+      <!-- Dropdowns -->
+      <div class="form-dropdowns">
+        <div class="dd-row">
+          <div class="dd-chip flex-1">
+            <span class="label">Isolated</span>
+            <span class="chevron"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4.5 6.5L8 10L11.5 6.5" stroke="#959595" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+          </div>
+          <div class="dd-chip w-fixed">
+            <span class="label mono">100x</span>
+            <span class="chevron"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4.5 6.5L8 10L11.5 6.5" stroke="#959595" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+          </div>
+        </div>
+        <div class="dd-chip flex-1">
+          <span class="label">Market</span>
+          <span class="chevron"><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4.5 6.5L8 10L11.5 6.5" stroke="#959595" stroke-width="1.2" stroke-linecap="round"/></svg></span>
+        </div>
+
+        <!-- Quantity input -->
+        <div class="text-input">
+          <input type="text" placeholder="Quantity" class="mono">
+          <div class="unit">
+            <span>BTC</span>
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M4.5 6.5L8 10L11.5 6.5" stroke="#eee" stroke-width="1.2" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+
+        <!-- Slider -->
+        <div class="slider-wrap">
+          <div class="slider-track">
+            <div class="slider-dot active"></div>
+            <div class="slider-line"></div>
+            <div class="slider-dot small"></div>
+            <div class="slider-line"></div>
+            <div class="slider-dot small"></div>
+            <div class="slider-line"></div>
+            <div class="slider-dot small"></div>
+            <div class="slider-line"></div>
+            <div class="slider-dot small"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Available + Checkboxes -->
+      <div class="form-meta">
+        <div class="avbl-row">
+          <span class="avbl-label mono">Available</span>
+          <span class="avbl-value mono">99,999.99 USDT</span>
+          <div class="avbl-plus">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="6" stroke="#959595" stroke-width="1"/><path d="M7 4.5V9.5M4.5 7H9.5" stroke="#959595" stroke-width="1" stroke-linecap="round"/></svg>
+          </div>
+        </div>
+
+        <!-- TP/SL checkbox -->
+        <div class="check-row" id="tpslRow">
+          <div class="checkbox" id="tpslCheck">
+            <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </div>
+          <span class="check-label">TP/SL</span>
+        </div>
+
+        <!-- Max slippage checkbox + inline input -->
+        <div class="slip-section">
+          <div class="check-row" id="slippageRow">
+            <div class="checkbox" id="slippageCheck">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M2.5 6L5 8.5L9.5 3.5" stroke="#111" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </div>
+            <span class="check-label dashed" id="slippageInfoBtn">Max slippage</span>
+          </div>
+
+          <!-- Inline Input Row -->
+          <div class="slip-input-row" id="slipInputRow">
+            <div class="slip-input-group" id="slipInputGroup">
+              <input type="text" inputmode="decimal" class="slip-field" id="slipField" value="0.02" placeholder="0.02">
+              <div class="slip-unit-btn" id="slipUnitBtn">
+                <span id="slipUnitText">%</span>
+                <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6.5L7 4" stroke="#959595" stroke-width="1" stroke-linecap="round"/></svg>
+              </div>
+            </div>
+            <!-- Unit Dropdown -->
+            <div class="slip-unit-dd" id="slipUnitDd">
+              <div class="slip-unit-dd-item selected" data-unit="percent">
+                <span>By Percent (%)</span>
+                <svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+              <div class="slip-unit-dd-item" data-unit="price">
+                <span>By Price (USDT)</span>
+                <svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </div>
+            </div>
+            <span class="slip-range-hint" id="slipRangeHint">Range: 0.01% – 10%</span>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Buy section -->
+      <div class="order-info-section">
+        <div class="info-block">
+          <div class="info-row">
+            <span class="info-label mono">Max size</span>
+            <span class="info-value mono">55.613795 USDT</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Margin</span>
+            <span class="info-value mono">-</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Est. liq. price</span>
+            <span class="info-value mono">-</span>
+          </div>
+        </div>
+        <button class="btn-order btn-buy">Buy / Long</button>
+
+        <div class="info-block">
+          <div class="info-row">
+            <span class="info-label mono">Max</span>
+            <span class="info-value mono">55.613795 BTC</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Margin</span>
+            <span class="info-value mono">-</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Est. liq. price</span>
+            <span class="info-value mono">-</span>
+          </div>
+        </div>
+        <button class="btn-order btn-sell">Sell / Short</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tabs -->
+  <div class="tab-section">
+    <div class="tab-row">
+      <div class="tab-item active">Positions (2)</div>
+      <div class="tab-item">Open Orders</div>
+      <div class="tab-item">History</div>
+      <div class="tab-actions"><a href="#">Close All</a></div>
+    </div>
+  </div>
+
+  <!-- Dummy Order Cards -->
+  <div class="order-cards">
+    <div class="order-card">
+      <div class="oc-top">
+        <div class="oc-pair">
+          <span class="oc-symbol">BTCUSDT</span>
+          <span class="oc-badge long">Long</span>
+        </div>
+        <span class="oc-type">Cross 20x</span>
+      </div>
+      <div class="oc-grid">
+        <div><div class="oc-field-label">Size</div><div class="oc-field-value mono">0.015 BTC</div></div>
+        <div><div class="oc-field-label">PnL (ROE%)</div><div class="oc-pnl positive mono">+124.50 USDT (+8.32%)</div></div>
+        <div><div class="oc-field-label">Entry price</div><div class="oc-field-value mono">121,450.2</div></div>
+        <div><div class="oc-field-label">Mark price</div><div class="oc-field-value mono">122,023.5</div></div>
+      </div>
+    </div>
+
+    <div class="order-card">
+      <div class="oc-top">
+        <div class="oc-pair">
+          <span class="oc-symbol">ETHUSDT</span>
+          <span class="oc-badge short">Short</span>
+        </div>
+        <span class="oc-type">Isolated 50x</span>
+      </div>
+      <div class="oc-grid">
+        <div><div class="oc-field-label">Size</div><div class="oc-field-value mono">1.25 ETH</div></div>
+        <div><div class="oc-field-label">PnL (ROE%)</div><div class="oc-pnl negative mono">-38.20 USDT (-3.14%)</div></div>
+        <div><div class="oc-field-label">Entry price</div><div class="oc-field-value mono">2,534.80</div></div>
+        <div><div class="oc-field-label">Mark price</div><div class="oc-field-value mono">2,565.35</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Info Bottom Sheet: Max Slippage -->
+  <div class="info-overlay" id="infoOverlay">
+    <div class="info-backdrop" id="infoBackdrop"></div>
+    <div class="info-sheet">
+      <div class="info-header">
+        <span class="info-title">Max Slippage</span>
+        <button class="info-close" id="infoClose">
+          <svg width="20" height="20" viewBox="0 0 20 20" fill="none"><path d="M5 5L15 15M15 5L5 15" stroke="#b4b4b4" stroke-width="1.6" stroke-linecap="round"/></svg>
+        </button>
+      </div>
+      <div class="info-body">
+        <p>The maximum slippage limit defines the worst execution price you are willing to accept.</p>
+        <p>Market orders will be placed as Limit orders with Time in Force = IOC (Immediate or Cancelled).</p>
+        <p>Any portion of the order that exceeds the slippage tolerance will be canceled. Please check the Order History in Limit Orders.</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const BASE_PRICE = 122023.5;
+
+/* ===== State ===== */
+let slippageEnabled = false;
+let currentMode = 'percent';    // 'percent' | 'price'
+let selectedPercent = 0.02;     // default
+let selectedPrice = 10;         // default
+let unitDdOpen = false;
+
+/* ===== DOM refs ===== */
+const slippageCheck  = document.getElementById('slippageCheck');
+const slipInputRow   = document.getElementById('slipInputRow');
+const slipInputGroup = document.getElementById('slipInputGroup');
+const slipField      = document.getElementById('slipField');
+const slipUnitBtn    = document.getElementById('slipUnitBtn');
+const slipUnitText   = document.getElementById('slipUnitText');
+const slipUnitDd     = document.getElementById('slipUnitDd');
+const slipRangeHint  = document.getElementById('slipRangeHint');
+
+/* ===== TP/SL checkbox (dummy) ===== */
+document.getElementById('tpslRow').addEventListener('click', function() {
+  document.getElementById('tpslCheck').classList.toggle('checked');
+});
+
+/* ===== Slippage checkbox toggle ===== */
+document.getElementById('slippageRow').addEventListener('click', function(e) {
+  if (e.target.closest('#slippageInfoBtn')) return;
+
+  slippageEnabled = !slippageEnabled;
+  slippageCheck.classList.toggle('checked', slippageEnabled);
+
+  if (slippageEnabled) {
+    slipInputRow.classList.add('visible');
+    syncInputDisplay();
+    setTimeout(() => slipField.focus(), 80);
+  } else {
+    slipInputRow.classList.remove('visible');
+    closeUnitDd();
+    resetDefaults();
+    syncInputDisplay();
+  }
+});
+
+/* ===== Input field behavior ===== */
+slipField.addEventListener('focus', function() {
+  slipInputGroup.classList.add('focus');
+  slipInputGroup.classList.remove('error');
+  slipRangeHint.classList.remove('error');
+  this.select();
+});
+
+slipField.addEventListener('blur', function() {
+  slipInputGroup.classList.remove('focus');
+  validateAndClamp();
+});
+
+slipField.addEventListener('input', function() {
+  // Allow only numbers and dot
+  this.value = this.value.replace(/[^0-9.]/g, '');
+  const parts = this.value.split('.');
+  if (parts.length > 2) this.value = parts[0] + '.' + parts.slice(1).join('');
+});
+
+slipField.addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') {
+    e.preventDefault();
+    this.blur();
+  }
+});
+
+function validateAndClamp() {
+  let val = parseFloat(slipField.value);
+
+  if (currentMode === 'percent') {
+    if (isNaN(val) || val <= 0) {
+      val = selectedPercent; // revert to last valid
+    } else {
+      // Show error state if out of range before clamping
+      if (val < 0.01 || val > 10) {
+        slipInputGroup.classList.add('error');
+        slipRangeHint.classList.add('error');
+        setTimeout(() => {
+          slipInputGroup.classList.remove('error');
+          slipRangeHint.classList.remove('error');
+        }, 1200);
+      }
+      val = Math.max(0.01, Math.min(val, 10));
+    }
+    selectedPercent = val;
+    // Format: remove trailing zeros but keep meaningful decimals
+    slipField.value = formatNum(val);
+  } else {
+    if (isNaN(val) || val <= 0) {
+      val = selectedPrice;
+    } else {
+      if (val < 0.1 || val > 1000) {
+        slipInputGroup.classList.add('error');
+        slipRangeHint.classList.add('error');
+        setTimeout(() => {
+          slipInputGroup.classList.remove('error');
+          slipRangeHint.classList.remove('error');
+        }, 1200);
+      }
+      val = Math.max(0.1, Math.min(val, 1000));
+    }
+    selectedPrice = val;
+    slipField.value = formatNum(val);
+  }
+}
+
+function formatNum(n) {
+  // Remove unnecessary trailing zeros
+  let s = parseFloat(n.toFixed(4)).toString();
+  return s;
+}
+
+/* ===== Unit toggle dropdown ===== */
+slipUnitBtn.addEventListener('click', function(e) {
+  e.stopPropagation();
+  if (unitDdOpen) {
+    closeUnitDd();
+  } else {
+    openUnitDd();
+  }
+});
+
+function openUnitDd() {
+  unitDdOpen = true;
+  slipUnitDd.classList.add('open');
+  syncUnitDdSelection();
+}
+
+function closeUnitDd() {
+  unitDdOpen = false;
+  slipUnitDd.classList.remove('open');
+}
+
+function syncUnitDdSelection() {
+  slipUnitDd.querySelectorAll('.slip-unit-dd-item').forEach(item => {
+    item.classList.toggle('selected', item.dataset.unit === currentMode);
+  });
+}
+
+/* Unit dropdown item click */
+slipUnitDd.querySelectorAll('.slip-unit-dd-item').forEach(item => {
+  item.addEventListener('click', function(e) {
+    e.stopPropagation();
+    const newMode = this.dataset.unit;
+    if (newMode === currentMode) {
+      closeUnitDd();
+      return;
+    }
+    currentMode = newMode;
+    syncInputDisplay();
+    syncUnitDdSelection();
+    closeUnitDd();
+    slipField.focus();
+  });
+});
+
+/* Outside click to close unit dropdown */
+document.addEventListener('click', function(e) {
+  if (!unitDdOpen) return;
+  if (e.target.closest('.slip-unit-btn') || e.target.closest('.slip-unit-dd')) return;
+  closeUnitDd();
+});
+
+/* ===== Display sync ===== */
+function syncInputDisplay() {
+  if (currentMode === 'percent') {
+    slipUnitText.textContent = '%';
+    slipField.value = formatNum(selectedPercent);
+    slipField.placeholder = '0.02';
+    slipRangeHint.textContent = 'Range: 0.01% – 10%';
+  } else {
+    slipUnitText.textContent = 'USDT';
+    slipField.value = formatNum(selectedPrice);
+    slipField.placeholder = '10';
+    slipRangeHint.textContent = 'Range: 0.1 – 1,000.0 USDT';
+  }
+  slipInputGroup.classList.remove('error');
+  slipRangeHint.classList.remove('error');
+}
+
+function resetDefaults() {
+  currentMode = 'percent';
+  selectedPercent = 0.02;
+  selectedPrice = 10;
+}
+
+/* ===== Info Bottom Sheet ===== */
+const infoOverlay = document.getElementById('infoOverlay');
+
+document.getElementById('slippageInfoBtn').addEventListener('click', function(e) {
+  e.stopPropagation();
+  infoOverlay.classList.add('open');
+});
+
+function closeInfo() {
+  infoOverlay.classList.remove('open');
+}
+document.getElementById('infoBackdrop').addEventListener('click', closeInfo);
+document.getElementById('infoClose').addEventListener('click', closeInfo);
+
+/* ===== Init ===== */
+syncInputDisplay();
+</script>
+</body>
+</html>
