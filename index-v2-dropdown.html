@@ -1535,6 +1535,7 @@ document.getElementById('slippageRow').addEventListener('click', function(e) {
   if (slippageEnabled) {
     slippageValBtn.classList.add('visible');
     updateDisplay();
+    setTimeout(() => openDropdown(), 0);
   } else {
     slippageValBtn.classList.remove('visible');
     closeDropdown();
