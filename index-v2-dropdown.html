@@ -561,29 +561,6 @@ body {
   box-shadow: 0 8px 24px rgba(0,0,0,0.45);
 }
 .slip-dd.open { display: block; }
-.slip-dd-toggle {
-  display: flex;
-  margin: 10px 12px 2px;
-  background: rgba(238,238,238,0.06);
-  border-radius: 8px;
-  padding: 2px;
-}
-.slip-dd-seg {
-  flex: 1;
-  padding: 6px 0;
-  font-size: 12px;
-  color: var(--text-m);
-  text-align: center;
-  cursor: pointer;
-  border-radius: 6px;
-  -webkit-tap-highlight-color: transparent;
-  transition: all 0.15s;
-}
-.slip-dd-seg.active {
-  background: rgba(238,238,238,0.12);
-  color: #f7f7f7;
-  font-weight: 600;
-}
 .slip-dd-list { padding: 4px 0; }
 .slip-dd-item {
   display: flex;
@@ -602,6 +579,13 @@ body {
 .slip-dd-item.selected .dd-check { display: block; }
 .slip-dd-item.cust-trigger {
   color: var(--text-m);
+  border-top: 1px solid var(--border);
+  margin-top: 2px;
+  padding-top: 10px;
+}
+.slip-dd-item.mode-switch {
+  color: var(--text-m);
+  font-size: 12px;
   border-top: 1px solid var(--border);
   margin-top: 2px;
   padding-top: 10px;
@@ -1282,16 +1266,13 @@ svg { display: block; }
 
           <!-- Slippage Dropdown -->
           <div class="slip-dd" id="slipDd">
-            <div class="slip-dd-toggle" id="ddToggle">
-              <span class="slip-dd-seg active" data-mode="percent">By Percent</span>
-              <span class="slip-dd-seg" data-mode="price">By Price</span>
-            </div>
             <div class="slip-dd-list" id="ddPercentList">
               <div class="slip-dd-item" data-value="0.1"><span>0.1%</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="slip-dd-item" data-value="0.3"><span>0.3%</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="slip-dd-item" data-value="0.5"><span>0.5%</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="slip-dd-item" data-value="1"><span>1.0%</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="slip-dd-item cust-trigger" id="ddCustPercent"><span>Customize</span></div>
+              <div class="slip-dd-item mode-switch" id="ddSwitchToPrice"><span>Price(USDT)로 변경</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6L4.5 9.5" stroke="#959595" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
             <div class="slip-dd-list" id="ddPriceList" style="display:none">
               <div class="slip-dd-item" data-value="1"><span>1 USDT</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
@@ -1299,6 +1280,7 @@ svg { display: block; }
               <div class="slip-dd-item" data-value="10"><span>10 USDT</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="slip-dd-item" data-value="20"><span>20 USDT</span><svg class="dd-check" width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M3 7L5.5 10L11 4" stroke="#f7f7f7" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
               <div class="slip-dd-item cust-trigger" id="ddCustPrice"><span>Customize</span></div>
+              <div class="slip-dd-item mode-switch" id="ddSwitchToPercent"><span>Percent(%)로 변경</span><svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M4.5 2.5L8 6L4.5 9.5" stroke="#959595" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
             </div>
           </div>
         </div>
@@ -1510,7 +1492,6 @@ const slippageValText = document.getElementById('slippageValText');
 const slipDd        = document.getElementById('slipDd');
 const ddPercentList = document.getElementById('ddPercentList');
 const ddPriceList   = document.getElementById('ddPriceList');
-const ddSegs        = document.querySelectorAll('.slip-dd-seg');
 
 const custOverlay   = document.getElementById('custOverlay');
 const custInput     = document.getElementById('custInput');
@@ -1573,24 +1554,20 @@ document.addEventListener('click', function(e) {
   closeDropdown();
 });
 
-/* ===== Dropdown pill toggle ===== */
-ddSegs.forEach(seg => {
-  seg.addEventListener('click', function() {
-    const mode = this.dataset.mode;
-    if (mode === currentMode) return;
-    currentMode = mode;
-    syncDdToggle();
-    syncDdList();
-    syncDdSelection();
-    updateDisplay();
-  });
+/* ===== Mode switch rows ===== */
+document.getElementById('ddSwitchToPrice').addEventListener('click', function() {
+  currentMode = 'price';
+  syncDdList();
+  syncDdSelection();
+  updateDisplay();
 });
 
-function syncDdToggle() {
-  ddSegs.forEach(s => s.classList.remove('active'));
-  const el = document.querySelector('.slip-dd-seg[data-mode="' + currentMode + '"]');
-  if (el) el.classList.add('active');
-}
+document.getElementById('ddSwitchToPercent').addEventListener('click', function() {
+  currentMode = 'percent';
+  syncDdList();
+  syncDdSelection();
+  updateDisplay();
+});
 
 function syncDdList() {
   ddPercentList.style.display = currentMode === 'percent' ? '' : 'none';
@@ -1718,7 +1695,7 @@ function updateDisplay() {
   } else {
     slippageValText.textContent = selectedPrice !== null ? selectedPrice + ' USDT' : '–';
   }
-  syncDdToggle();
+  syncDdList();
 }
 
 function resetDefaults() {
