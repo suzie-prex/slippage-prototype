@@ -342,8 +342,8 @@ html, body {
 
   <!-- Tabs -->
   <div class="tab-bar">
-    <button class="tab-btn active" data-panel="v1">V1 — Dropdown Preset</button>
-    <button class="tab-btn" data-panel="v2">V2 — Text Field</button>
+    <button class="tab-btn active" data-panel="v1">V1 — Text Field</button>
+    <button class="tab-btn" data-panel="v2">V2 — Dropdown Preset</button>
   </div>
 
   <!-- V1 Panel -->
@@ -351,11 +351,77 @@ html, body {
     <div class="two-col">
       <div class="col-phone">
         <div class="phone-device">
-          <iframe src="index-v1-dropdown.html" id="iframe-v1"></iframe>
+          <iframe src="index-v1-textfield.html" id="iframe-v1"></iframe>
         </div>
       </div>
       <div class="col-summary">
         <div class="v-badge"><span class="v-badge-label">V1</span></div>
+        <h2 class="v-title">Text Field</h2>
+        <p class="v-desc">인라인 텍스트 입력으로 슬리피지 값을 직접 설정하는 방식. 별도 바텀시트 없이 한 화면에서 완결되는 단순한 구조입니다.</p>
+
+        <div class="section-label">Interaction Flow</div>
+        <ol class="flow-list">
+          <li class="flow-item">
+            <span class="flow-num">1</span>
+            <span class="flow-text"><strong>체크박스 ON</strong> → 인풋 필드 노출 (기본 0.5%)</span>
+          </li>
+          <li class="flow-item">
+            <span class="flow-num">2</span>
+            <span class="flow-text"><strong>값 직접 입력</strong> → blur 시 유효범위 자동 클램프 (초과 시 에러 플래시)</span>
+          </li>
+          <li class="flow-item">
+            <span class="flow-num">3</span>
+            <span class="flow-text"><strong>유닛 버튼 (% ▾) 탭</strong> → 드롭다운으로 By Percent ↔ By Price 전환</span>
+          </li>
+          <li class="flow-item">
+            <span class="flow-num">4</span>
+            <span class="flow-text"><strong>Buy/Sell 탭</strong> → 오더 프리뷰 바텀시트. 슬리피지 ON 시 Max slippage (% + USDT) · Max exec. price 표시</span>
+          </li>
+        </ol>
+
+        <div class="section-label">Value Input Rules</div>
+        <table class="spec-table">
+          <tr><th>Percent</th><td>기본 <code>0.5%</code> · 범위 0.1% – 5.0%</td></tr>
+          <tr><th>Price</th><td>기본값 없음 (유저 직접 입력) · 범위 0.1 – 1,000 USDT</td></tr>
+          <tr><th>초과 처리</th><td>Max 초과 시 즉시 max 값으로 자동 치환</td></tr>
+        </table>
+
+        <div class="pros-cons">
+          <div class="pc-block">
+            <div class="pc-title pros"><span class="pc-dot"></span>장점</div>
+            <ul class="pc-list">
+              <li>한 스텝으로 어떤 값이든 설정 가능</li>
+              <li>인터랙션 depth가 얕음 (인풋 + 유닛 토글)</li>
+              <li>세밀한 커스텀 값 설정에 유리</li>
+            </ul>
+          </div>
+          <div class="pc-block">
+            <div class="pc-title cons"><span class="pc-dot"></span>단점</div>
+            <ul class="pc-list">
+              <li>유저가 직접 적정 값을 판단해야 함</li>
+              <li>소수점 오타 리스크 (0.5 vs 5.0)</li>
+              <li>가이드라인 없이 빈 필드는 진입장벽</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="best-for">
+          <strong>Best for:</strong> 매 거래마다 슬리피지를 세밀하게 조절하는 고급 트레이더. 빠른 입력 + 정밀 제어가 중요한 경우 적합.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- V2 Panel -->
+  <div class="panel" id="panel-v2">
+    <div class="two-col">
+      <div class="col-phone">
+        <div class="phone-device">
+          <iframe src="index-v2-dropdown.html" id="iframe-v2"></iframe>
+        </div>
+      </div>
+      <div class="col-summary">
+        <div class="v-badge"><span class="v-badge-label">V2</span></div>
         <h2 class="v-title">Dropdown Preset</h2>
         <p class="v-desc">미리 정의된 프리셋 목록에서 슬리피지 값을 선택하는 방식. Binance, Bybit 등 주요 거래소에서 사용하는 표준 패턴으로, 대부분의 유저가 익숙한 UI입니다.</p>
 
@@ -411,72 +477,6 @@ html, body {
 
         <div class="best-for">
           <strong>Best for:</strong> 기본값을 주로 사용하고, 가끔 변경하는 일반적 트레이딩 시나리오. 초보 ~ 중급 유저가 많은 경우 적합.
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- V2 Panel -->
-  <div class="panel" id="panel-v2">
-    <div class="two-col">
-      <div class="col-phone">
-        <div class="phone-device">
-          <iframe src="index-v2-textfield.html" id="iframe-v2"></iframe>
-        </div>
-      </div>
-      <div class="col-summary">
-        <div class="v-badge"><span class="v-badge-label">V2</span></div>
-        <h2 class="v-title">Text Field</h2>
-        <p class="v-desc">인라인 텍스트 입력으로 슬리피지 값을 직접 설정하는 방식. 별도 바텀시트 없이 한 화면에서 완결되는 단순한 구조입니다.</p>
-
-        <div class="section-label">Interaction Flow</div>
-        <ol class="flow-list">
-          <li class="flow-item">
-            <span class="flow-num">1</span>
-            <span class="flow-text"><strong>체크박스 ON</strong> → 인풋 필드 노출 + 자동 포커스</span>
-          </li>
-          <li class="flow-item">
-            <span class="flow-num">2</span>
-            <span class="flow-text"><strong>값 직접 입력</strong> → blur 시 유효범위 자동 클램프 (초과 시 에러 플래시)</span>
-          </li>
-          <li class="flow-item">
-            <span class="flow-num">3</span>
-            <span class="flow-text"><strong>유닛 버튼 (% ▾) 탭</strong> → 드롭다운으로 By Percent ↔ By Price 전환</span>
-          </li>
-          <li class="flow-item">
-            <span class="flow-num">4</span>
-            <span class="flow-text"><strong>Buy/Sell 탭</strong> → 오더 프리뷰 바텀시트. 슬리피지 ON 시 Max slippage (% + USDT) · Max exec. price 표시</span>
-          </li>
-        </ol>
-
-        <div class="section-label">Value Input Rules</div>
-        <table class="spec-table">
-          <tr><th>Percent</th><td>기본 <code>0.5%</code> · 범위 0.1% – 5.0%</td></tr>
-          <tr><th>Price</th><td>기본값 없음 (유저 직접 입력) · 범위 0.1 – 1,000 USDT</td></tr>
-          <tr><th>초과 처리</th><td>Max 초과 시 즉시 max 값으로 자동 치환</td></tr>
-        </table>
-
-        <div class="pros-cons">
-          <div class="pc-block">
-            <div class="pc-title pros"><span class="pc-dot"></span>장점</div>
-            <ul class="pc-list">
-              <li>한 스텝으로 어떤 값이든 설정 가능</li>
-              <li>인터랙션 depth가 얕음 (인풋 + 유닛 토글)</li>
-              <li>세밀한 커스텀 값 설정에 유리</li>
-            </ul>
-          </div>
-          <div class="pc-block">
-            <div class="pc-title cons"><span class="pc-dot"></span>단점</div>
-            <ul class="pc-list">
-              <li>적절한 값을 유저가 직접 판단해야 함</li>
-              <li>모바일 키보드가 화면의 절반을 차지</li>
-              <li>오타, 범위 초과 등 입력 오류 가능성</li>
-            </ul>
-          </div>
-        </div>
-
-        <div class="best-for">
-          <strong>Best for:</strong> 전략이 명확한 파워유저가 많고, 커스텀 값 설정 빈도가 높은 시나리오. 단순한 UI를 선호하는 경우 적합.
         </div>
       </div>
     </div>
