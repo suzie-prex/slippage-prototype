@@ -386,7 +386,7 @@ html, body {
         <ol class="flow-list">
           <li class="flow-item">
             <span class="flow-num">1</span>
-            <span class="flow-text"><strong>체크박스 ON</strong> → 인풋 필드 노출 (기본 0.5%)</span>
+            <span class="flow-text"><strong>체크박스 ON</strong> → 인풋 필드 노출 (값 직접 입력)</span>
           </li>
           <li class="flow-item">
             <span class="flow-num">2</span>
@@ -404,15 +404,15 @@ html, body {
 
         <div class="section-label">Value Input Rules</div>
         <table class="spec-table">
-          <tr><th>Percent</th><td>기본 <code>0.5%</code> · 범위 0.1% – 5.0%</td></tr>
+          <tr><th>Percent</th><td>기본값 없음 · 범위 0.1% – 5.0%</td></tr>
           <tr><th>Price</th><td>기본값 없음 (유저 직접 입력) · 범위 0.1 – 1,000 USDT</td></tr>
           <tr><th>초과 처리</th><td>Max 초과 시 즉시 max 값으로 자동 치환</td></tr>
         </table>
 
         <div class="proposal-note">
-          <div class="proposal-note-title">Proposal</div>
-          <strong>% 기본값을 0.5% pre-filled로 제안합니다.</strong> PRD는 empty이지만, 기본값이 있으면 즉시 주문이 가능하고 유저의 판단 부담이 줄어듭니다. 다만 프로 트레이더는 직접 설정을 선호할 수 있어 의견이 필요합니다.<br>
-          <span class="note-dim">경쟁사: 바이낸스 — empty · 바이빗 — pre-filled</span>
+          <div class="proposal-note-title">Note</div>
+          <strong>주문 후 체크박스는 유지, 값만 초기화됩니다.</strong> 슬리피지를 켠 의사는 유지하되, 다음 주문에서 시장 상황에 맞게 값을 새로 설정하도록 합니다.<br>
+          <span class="note-dim">바이낸스도 동일 방식 (체크 유지 + 값 클리어)</span>
         </div>
 
         <div class="pros-cons">
@@ -458,7 +458,7 @@ html, body {
         <ol class="flow-list">
           <li class="flow-item">
             <span class="flow-num">1</span>
-            <span class="flow-text"><strong>체크박스 ON</strong> → 인라인 값 표시 (기본 0.5%)</span>
+            <span class="flow-text"><strong>체크박스 ON</strong> → 인라인 값 표시 (프리셋에서 선택)</span>
           </li>
           <li class="flow-item">
             <span class="flow-num">2</span>
@@ -480,15 +480,15 @@ html, body {
 
         <div class="section-label">Value Input Rules</div>
         <table class="spec-table">
-          <tr><th>Percent</th><td>기본 <code>0.5%</code> · 범위 0.1% – 5.0% · 프리셋 0.1 · 0.3 · 0.5 · 1.0</td></tr>
+          <tr><th>Percent</th><td>기본값 없음 · 범위 0.1% – 5.0% · 프리셋 0.1 · 0.3 · 0.5 · 1.0</td></tr>
           <tr><th>Price</th><td>기본값 없음 · 범위 0.1 – 1,000 USDT · 프리셋 1 · 5 · 10 · 20</td></tr>
           <tr><th>초과 처리</th><td>Max 초과 시 즉시 max 값으로 자동 치환</td></tr>
         </table>
 
         <div class="proposal-note">
-          <div class="proposal-note-title">Proposal</div>
-          <strong>% 기본값을 0.5% pre-filled로 제안합니다.</strong> PRD는 empty이지만, 기본값이 있으면 즉시 주문이 가능하고 유저의 판단 부담이 줄어듭니다. 다만 프로 트레이더는 직접 설정을 선호할 수 있어 의견이 필요합니다.<br>
-          <span class="note-dim">경쟁사: 바이낸스 — empty · 바이빗 — pre-filled</span>
+          <div class="proposal-note-title">Note</div>
+          <strong>주문 후 체크박스는 유지, 값만 초기화됩니다.</strong> 슬리피지를 켠 의사는 유지하되, 다음 주문에서 시장 상황에 맞게 값을 새로 설정하도록 합니다.<br>
+          <span class="note-dim">바이낸스도 동일 방식 (체크 유지 + 값 클리어)</span>
         </div>
 
         <div class="pros-cons">

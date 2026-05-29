@@ -1266,7 +1266,7 @@ svg { display: block; }
           <div class="slip-input-row" id="slipInputRow">
             <div class="slip-input-group" id="slipInputGroup">
               <span class="slip-mode-label" id="slipModeLabel">By Percent</span>
-              <input type="text" inputmode="none" class="slip-field" id="slipField" value="0.5" placeholder="By Percent">
+              <input type="text" inputmode="none" class="slip-field" id="slipField" value="" placeholder="By Percent">
               <div class="slip-unit-btn" id="slipUnitBtn">
                 <span id="slipUnitText">%</span>
                 <svg width="10" height="10" viewBox="0 0 10 10" fill="none"><path d="M3 4L5 6.5L7 4" stroke="#959595" stroke-width="1" stroke-linecap="round"/></svg>
@@ -1483,7 +1483,7 @@ const BASE_PRICE = 122023.5;
 /* ===== State ===== */
 let slippageEnabled = false;
 let currentMode = 'percent';    // 'percent' | 'price'
-let selectedPercent = 0.5;      // default
+let selectedPercent = null;      // no default — user must enter
 let selectedPrice = null;        // no default — user must enter
 let unitDdOpen = false;
 
@@ -1574,6 +1574,10 @@ function validateAndClamp() {
 
   if (currentMode === 'percent') {
     if (isNaN(val) || val <= 0) {
+      if (selectedPercent === null) {
+        slipField.value = '';
+        return;
+      }
       val = selectedPercent; // revert to last valid
     } else {
       // Show error state if out of range before clamping
@@ -1679,7 +1683,7 @@ function syncInputDisplay() {
 
   if (currentMode === 'percent') {
     slipUnitText.textContent = '%';
-    slipField.value = formatNum(selectedPercent);
+    slipField.value = selectedPercent !== null ? formatNum(selectedPercent) : '';
     slipRangeHint.textContent = 'Range: 0.1% – 5.0%';
     slipRangeHint.style.display = '';
   } else {
@@ -1695,7 +1699,7 @@ function syncInputDisplay() {
 
 function resetDefaults() {
   currentMode = 'percent';
-  selectedPercent = 0.5;
+  selectedPercent = null;
   selectedPrice = null;
 }
 
@@ -1775,7 +1779,7 @@ function openPreview(side) {
   }
 
   // Slippage rows — show only when value is actually set
-  const hasSlippage = slippageEnabled && (currentMode === 'percent' || selectedPrice !== null);
+  const hasSlippage = slippageEnabled && ((currentMode === 'percent' && selectedPercent !== null) || (currentMode === 'price' && selectedPrice !== null));
   if (hasSlippage) {
     pvSlipRow.classList.add('visible');
     pvExecRow.classList.add('visible');
@@ -1808,13 +1812,11 @@ function closePreview() {
 document.getElementById('pvBackdrop').addEventListener('click', closePreview);
 pvCta.addEventListener('click', function() {
   closePreview();
-  // After order: reset slippage input (PRD requirement)
-  slippageEnabled = false;
-  slippageCheck.classList.remove('checked');
-  slipInputRow.classList.remove('visible');
-  closeUnitDd();
-  resetDefaults();
-  syncInputDisplay();
+  // After order: keep checkbox checked, clear value only
+  if (slippageEnabled) {
+    resetDefaults();
+    syncInputDisplay();
+  }
 });
 document.getElementById('pvSkipCheck').parentElement.addEventListener('click', function() {
   document.getElementById('pvSkipCheck').classList.toggle('checked');
