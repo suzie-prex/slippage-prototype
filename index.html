@@ -322,6 +322,106 @@ html, body {
   font-weight: 600;
 }
 
+/* Proposal Note */
+.proposal-section {
+  margin-top: 48px;
+  padding: 28px 24px;
+  background: var(--bg1);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+}
+.proposal-title {
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-p);
+  margin-bottom: 6px;
+}
+.proposal-subtitle {
+  font-size: 12px;
+  color: var(--text-m);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 16px;
+}
+.proposal-body {
+  font-size: 13px;
+  color: var(--text-s);
+  line-height: 21px;
+}
+.proposal-body p {
+  margin-bottom: 12px;
+}
+.proposal-body strong {
+  color: var(--text-p);
+  font-weight: 600;
+}
+.proposal-compare {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin: 16px 0;
+}
+.proposal-card {
+  padding: 14px 16px;
+  border-radius: 10px;
+  font-size: 13px;
+  line-height: 20px;
+}
+.proposal-card.current {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid var(--border);
+}
+.proposal-card.proposed {
+  background: rgba(10,132,255,0.06);
+  border: 1px solid rgba(10,132,255,0.15);
+}
+.proposal-card-label {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 6px;
+}
+.proposal-card.current .proposal-card-label { color: var(--text-m); }
+.proposal-card.proposed .proposal-card-label { color: var(--blue); }
+.proposal-card-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-p);
+}
+.proposal-reasons {
+  list-style: none;
+  padding: 0;
+  margin: 16px 0 0;
+}
+.proposal-reasons li {
+  padding: 6px 0;
+  padding-left: 16px;
+  position: relative;
+  font-size: 13px;
+  color: var(--text-s);
+  line-height: 20px;
+}
+.proposal-reasons li::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 12px;
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: var(--blue);
+  opacity: 0.5;
+}
+.proposal-ref {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: rgba(255,255,255,0.02);
+  border-radius: 8px;
+  font-size: 12px;
+  color: var(--text-m);
+  line-height: 18px;
+}
+.proposal-ref strong { color: var(--text-t); }
+
 /* === Responsive === */
 @media (max-width: 960px) {
   .page { padding: 32px 20px 60px; }
@@ -478,6 +578,39 @@ html, body {
         <div class="best-for">
           <strong>Best for:</strong> 기본값을 주로 사용하고, 가끔 변경하는 일반적 트레이딩 시나리오. 초보 ~ 중급 유저가 많은 경우 적합.
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Proposal: Default Value -->
+  <div class="proposal-section">
+    <div class="proposal-subtitle">Design Proposal</div>
+    <div class="proposal-title">% 기본값: empty → 0.5% pre-filled은 어떨까요?</div>
+    <div class="proposal-body">
+      <p>PRD 기준은 <strong>empty</strong>이지만, 기본값을 미리 채워두면 아래 이점이 있을 것 같아 논의해보고 싶습니다.</p>
+
+      <div class="proposal-compare">
+        <div class="proposal-card current">
+          <div class="proposal-card-label">PRD 현재</div>
+          <div class="proposal-card-value">Empty</div>
+        </div>
+        <div class="proposal-card proposed">
+          <div class="proposal-card-label">제안</div>
+          <div class="proposal-card-value">0.5% Pre-filled</div>
+        </div>
+      </div>
+
+      <ul class="proposal-reasons">
+        <li><strong>즉시 주문 가능</strong> — 체크박스 ON만으로 유효한 상태가 되어, 값을 입력하지 않아도 바로 주문할 수 있음</li>
+        <li><strong>판단 부담 감소</strong> — 슬리피지 개념에 익숙하지 않은 유저가 적정값을 고민하지 않아도 됨</li>
+      </ul>
+
+      <div class="proposal-ref">
+        <strong>의견이 필요한 부분:</strong> 서비스 타겟이 프로 트레이더인 만큼, 본인이 설정하지 않은 기본값이 채워져 있는 것을 오히려 불편하게 느낄 수 있을지 궁금합니다. 프로 트레이더는 매 거래마다 슬리피지를 의도적으로 설정하는 경향이 있어, 시스템이 임의로 넣어둔 값보다 직접 입력하는 것을 선호할 수도 있습니다.
+      </div>
+
+      <div class="proposal-ref" style="margin-top: 8px;">
+        <strong>경쟁사:</strong> 바이낸스 — 기본값 없음 · 바이빗 — 기본값 있음 (pre-filled)
       </div>
     </div>
   </div>
